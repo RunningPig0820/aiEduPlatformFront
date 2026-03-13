@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 自定义样式 */
+.auth-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+.tab-active {
+  border-bottom: 3px solid #667eea;
+  color: #667eea;
+  font-weight: 600;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+.input-with-icon {
+  padding-left: 40px;
+}
+
+/* 通用布局 */
+.sidebar {
+  @apply w-64 bg-base-200 min-h-screen;
+}
+
+.main-content {
+  @apply flex-1 p-6;
+}
+
+/* 卡片样式 */
+.stat-card {
+  @apply card bg-base-100 shadow-md hover:shadow-lg transition-shadow;
+}
+
+/* 表格样式 */
+.data-table {
+  @apply table table-zebra w-full;
+}
