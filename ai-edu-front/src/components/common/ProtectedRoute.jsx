@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
-import { ROUTES, ROLE_ROUTES } from '../constants'
+import { useAuth } from '../../hooks/useAuth'
+import { ROUTES, ROLE_ROUTES } from '../../constants'
 
 /**
  * 受保护的路由组件
