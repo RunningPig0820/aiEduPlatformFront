@@ -47,7 +47,7 @@ export function MainLayout() {
       {/* 页脚 */}
       <footer className="footer footer-center p-4 bg-base-200 text-base-content">
         <div>
-          <p>&copy; 2024 AI 教育平台 - 智能学习，精准提升</p>
+          <p>&copy; 2026 AI 教育平台 - 智能学习，精准提升</p>
         </div>
       </footer>
     </div>
