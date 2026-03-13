@@ -19,16 +19,38 @@
   font-weight: 600;
 }
 
-.input-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #9ca3af;
+/* 输入框容器 - 用于图标定位 */
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.input-with-icon {
-  padding-left: 40px;
+.input-prefix-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 48px;
+  color: #667eea;
+  flex-shrink: 0;
+}
+
+.input-suffix-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 48px;
+  color: #9ca3af;
+  flex-shrink: 0;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
+
+.input-suffix-btn:hover {
+  color: #667eea;
 }
 
 /* 通用布局 */
