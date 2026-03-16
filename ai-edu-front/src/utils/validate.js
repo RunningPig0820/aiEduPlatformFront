@@ -55,11 +55,11 @@ export function validateUsername(username) {
   if (!username) {
     return { valid: false, message: '用户名不能为空' }
   }
-  if (username.length < 3 || username.length > 20) {
-    return { valid: false, message: '用户名长度应为3-20个字符' }
+  if (username.length < 3 || username.length > 50) {
+    return { valid: false, message: '用户名长度应为3-50个字符' }
   }
-  if (!/^[a-zA-Z0-9_\u4e00-\u9fa5]+$/.test(username)) {
-    return { valid: false, message: '用户名只能包含字母、数字、下划线和中文' }
+  if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(username)) {
+    return { valid: false, message: '用户名需以字母开头，仅含字母、数字、下划线' }
   }
   return { valid: true, message: '' }
 }

@@ -4,6 +4,7 @@ import axios from 'axios'
 const request = axios.create({
   baseURL: '/api',
   timeout: 10000,
+  withCredentials: true, // 重要：携带 Cookie（后端使用 Session）
   headers: {
     'Content-Type': 'application/json'
   }
@@ -12,11 +13,7 @@ const request = axios.create({
 // Request interceptor
 request.interceptors.request.use(
   (config) => {
-    // Add auth token if exists
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
+    // 后端使用 Session 认证，无需 Token
     return config
   },
   (error) => {

@@ -51,8 +51,8 @@ export function AuthProvider({ children }) {
   }, [])
 
   // Send code
-  const sendCode = useCallback(async (phone) => {
-    return await authApi.sendCode(phone)
+  const sendCode = useCallback(async (phone, scene) => {
+    return await authApi.sendCode(phone, scene)
   }, [])
 
   const value = {
