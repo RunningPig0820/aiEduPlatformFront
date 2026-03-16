@@ -1,5 +1,5 @@
 ---
-name: api-integration
+name: api-edu-integration
 description: 添加新的API调用或修改API集成时使用
 ---
 

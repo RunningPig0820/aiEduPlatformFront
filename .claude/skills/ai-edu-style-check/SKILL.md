@@ -1,5 +1,5 @@
 ---
-name: style-check
+name: ai-edu-style-check
 description: 检查样式代码是否符合 Tailwind + daisyUI 规范
 ---
 

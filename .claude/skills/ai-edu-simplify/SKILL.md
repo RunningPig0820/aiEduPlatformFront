@@ -1,5 +1,5 @@
 ---
-name: simplify
+name: ai-edu-simplify
 description: 检查代码重用、质量和效率，然后修复发现的问题
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: page-development
+name: ai-edu-page-development
 description: 新建或修改页面时使用，确保遵循项目架构规范
 ---
 
