@@ -47,7 +47,7 @@ export const authApi = {
   register: (data) =>
     request.post('/auth/register', data),
 
-  // 发送验证码
+  // 发送验证码 - 返回验证码字符串（开发环境自动填充）
   sendCode: (phone, scene) =>
     request.post('/auth/send-code', { phone, scene }),
 

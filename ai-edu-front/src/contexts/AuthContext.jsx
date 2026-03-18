@@ -50,9 +50,10 @@ export function AuthProvider({ children }) {
     return await authApi.register(data)
   }, [])
 
-  // Send code
+  // Send code - 返回验证码用于自动填充
   const sendCode = useCallback(async (phone, scene) => {
-    return await authApi.sendCode(phone, scene)
+    const code = await authApi.sendCode(phone, scene)
+    return code // 返回验证码字符串
   }, [])
 
   const value = {

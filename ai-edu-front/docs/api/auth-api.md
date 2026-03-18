@@ -124,16 +124,16 @@ curl -X POST http://localhost:8080/api/auth/register \
 **JavaScript (fetch):**
 ```javascript
 const response = await fetch('/api/auth/register', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    username: 'testuser',
-    password: '123456',
-    realName: '测试用户',
-    phone: '13800138000',
-    code: '123456',
-    role: 'STUDENT'
-  })
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        username: 'testuser',
+        password: '123456',
+        realName: '测试用户',
+        phone: '13800138000',
+        code: '123456',
+        role: 'STUDENT'
+    })
 });
 const result = await response.json();
 ```
@@ -262,14 +262,14 @@ curl -X POST http://localhost:8080/api/auth/login \
 ```javascript
 // 用户名密码登录
 const response = await fetch('/api/auth/login', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  credentials: 'include', // 重要：携带 Cookie
-  body: JSON.stringify({
-    loginType: 'USERNAME_PASSWORD',
-    username: 'testuser',
-    password: '123456'
-  })
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include', // 重要：携带 Cookie
+    body: JSON.stringify({
+        loginType: 'USERNAME_PASSWORD',
+        username: 'testuser',
+        password: '123456'
+    })
 });
 const result = await response.json();
 ```
@@ -346,10 +346,10 @@ curl -X POST http://localhost:8080/api/auth/demo-login \
 **JavaScript (fetch):**
 ```javascript
 const response = await fetch('/api/auth/demo-login', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  credentials: 'include',
-  body: JSON.stringify({ role: 'STUDENT' })
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ role: 'STUDENT' })
 });
 ```
 
@@ -378,6 +378,16 @@ const response = await fetch('/api/auth/demo-login', {
 |------|------|------|----------|------|
 | phone | String | 是 | 11 位手机号格式 | 目标手机号 |
 | scene | String | 是 | 枚举值 | 验证码场景，见下表 |
+
+### 响应参数
+
+```json
+{
+  "code": "00000",
+  "message": "success",
+  "data": "string"
+}
+```
 
 ### scene 枚举值
 
@@ -411,12 +421,12 @@ curl -X POST http://localhost:8080/api/auth/send-code \
 **JavaScript (fetch):**
 ```javascript
 const response = await fetch('/api/auth/send-code', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    phone: '13800138000',
-    scene: 'REGISTER'
-  })
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        phone: '13800138000',
+        scene: 'REGISTER'
+    })
 });
 ```
 
@@ -480,13 +490,13 @@ curl -X POST http://localhost:8080/api/auth/reset-password \
 **JavaScript (fetch):**
 ```javascript
 const response = await fetch('/api/auth/reset-password', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    phone: '13800138000',
-    code: '123456',
-    newPassword: 'newpassword123'
-  })
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        phone: '13800138000',
+        code: '123456',
+        newPassword: 'newpassword123'
+    })
 });
 ```
 
@@ -550,13 +560,13 @@ curl -X PUT http://localhost:8080/api/auth/password \
 **JavaScript (fetch):**
 ```javascript
 const response = await fetch('/api/auth/password', {
-  method: 'PUT',
-  headers: { 'Content-Type': 'application/json' },
-  credentials: 'include',
-  body: JSON.stringify({
-    oldPassword: '123456',
-    newPassword: 'newpassword123'
-  })
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({
+        oldPassword: '123456',
+        newPassword: 'newpassword123'
+    })
 });
 ```
 
@@ -605,8 +615,8 @@ curl -X POST http://localhost:8080/api/auth/logout \
 **JavaScript (fetch):**
 ```javascript
 const response = await fetch('/api/auth/logout', {
-  method: 'POST',
-  credentials: 'include'
+    method: 'POST',
+    credentials: 'include'
 });
 ```
 
@@ -655,11 +665,11 @@ curl -X GET http://localhost:8080/api/auth/current-user \
 **JavaScript (fetch):**
 ```javascript
 const response = await fetch('/api/auth/current-user', {
-  credentials: 'include'
+    credentials: 'include'
 });
 const result = await response.json();
 if (result.code === '00000') {
-  console.log('当前用户:', result.data);
+    console.log('当前用户:', result.data);
 }
 ```
 
@@ -769,7 +779,7 @@ const result = await response.json();
 ```javascript
 // fetch 请求示例
 fetch('/api/auth/current-user', {
-  credentials: 'include' // 重要：携带 Cookie
+    credentials: 'include' // 重要：携带 Cookie
 });
 ```
 

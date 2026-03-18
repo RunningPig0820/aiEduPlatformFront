@@ -62,20 +62,20 @@ export function Login() {
   // 判断是否为手机号
   const isPhoneNumber = (str) => /^1[3-9]\d{9}$/.test(str)
 
-  // 发送验证码（通用）
+  // 发送验证码（通用）- 返回验证码用于自动填充
   const handleSendCode = async (phone, scene) => {
     if (!phone || phone.length !== 11) {
       showModal('error', '请输入正确的手机号')
-      return false
+      return null
     }
     try {
-      await sendCode(phone, scene)
+      const code = await sendCode(phone, scene)
       showModal('success', '验证码已发送')
       startCountdown()
-      return true
+      return code // 返回验证码用于自动填充
     } catch (error) {
       showModal('error', error.message || '发送失败')
-      return false
+      return null
     }
   }
 
@@ -145,7 +145,11 @@ export function Login() {
       showModal('error', '请先输入正确的手机号')
       return
     }
-    await handleSendCode(loginForm.identifier, CodeScene.LOGIN)
+    const code = await handleSendCode(loginForm.identifier, CodeScene.LOGIN)
+    if (code) {
+      // 自动填入验证码
+      setLoginForm({ ...loginForm, code: String(code) })
+    }
   }
 
   // 演示登录
@@ -166,7 +170,11 @@ export function Login() {
 
   // 发送注册验证码
   const handleRegisterSendCode = async () => {
-    await handleSendCode(registerForm.phone, CodeScene.REGISTER)
+    const code = await handleSendCode(registerForm.phone, CodeScene.REGISTER)
+    if (code) {
+      // 自动填入验证码
+      setRegisterForm({ ...registerForm, code: String(code) })
+    }
   }
 
   // 注册处理
@@ -220,7 +228,11 @@ export function Login() {
 
   // 发送重置密码验证码
   const handleResetSendCode = async () => {
-    await handleSendCode(resetForm.phone, CodeScene.RESET_PASSWORD)
+    const code = await handleSendCode(resetForm.phone, CodeScene.RESET_PASSWORD)
+    if (code) {
+      // 自动填入验证码
+      setResetForm({ ...resetForm, code: String(code) })
+    }
   }
 
   // 重置密码处理
