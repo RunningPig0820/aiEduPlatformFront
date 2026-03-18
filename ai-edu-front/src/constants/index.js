@@ -28,6 +28,9 @@ export const ROUTES = {
   PARENT_NOTIFICATIONS: '/parent/notifications',
   PARENT_SETTINGS: '/parent/settings',
 
+  // 管理员端
+  ADMIN: '/admin',
+
   // 其他
   NOT_FOUND: '/404'
 }
@@ -52,14 +55,16 @@ export const ROLE_LABELS = {
 export const ROLE_ROUTES = {
   [ROLES.STUDENT]: ROUTES.STUDENT,
   [ROLES.TEACHER]: ROUTES.TEACHER,
-  [ROLES.PARENT]: ROUTES.PARENT
+  [ROLES.PARENT]: ROUTES.PARENT,
+  [ROLES.ADMIN]: ROUTES.ADMIN
 }
 
 // 角色主题颜色
 export const ROLE_COLORS = {
   [ROLES.STUDENT]: 'success',
   [ROLES.TEACHER]: 'primary',
-  [ROLES.PARENT]: 'warning'
+  [ROLES.PARENT]: 'warning',
+  [ROLES.ADMIN]: 'secondary'
 }
 
 // API 响应码
