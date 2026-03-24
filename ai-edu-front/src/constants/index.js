@@ -11,6 +11,9 @@ export const ROUTES = {
   STUDENT_REPORT: '/student/report',
   STUDENT_PRACTICE: '/student/practice',
   STUDENT_PAPERS: '/student/papers',
+  STUDENT_AI_QA: '/student/ai-qa',
+  STUDENT_LIVE: '/student/live',
+  STUDENT_VIDEO: '/student/video',
 
   // 老师端
   TEACHER: '/teacher',
@@ -19,6 +22,11 @@ export const ROUTES = {
   TEACHER_GRADING: '/teacher/grading',
   TEACHER_QUESTIONS: '/teacher/questions',
   TEACHER_ANALYSIS: '/teacher/analysis',
+  TEACHER_AI_PREPARE: '/teacher/ai-prepare',
+  TEACHER_AI_PAPER: '/teacher/ai-paper',
+  TEACHER_AI_GRADE: '/teacher/ai-grade',
+  TEACHER_LIVE: '/teacher/live',
+  TEACHER_VIDEO: '/teacher/video',
 
   // 家长端
   PARENT: '/parent',
@@ -27,9 +35,16 @@ export const ROUTES = {
   PARENT_MESSAGES: '/parent/messages',
   PARENT_NOTIFICATIONS: '/parent/notifications',
   PARENT_SETTINGS: '/parent/settings',
+  PARENT_PROFILE: '/parent/profile',
+  PARENT_PICKUP: '/parent/pickup',
 
   // 管理员端
   ADMIN: '/admin',
+  ADMIN_ORGANIZATIONS: '/admin/organizations',
+  ADMIN_USERS: '/admin/users',
+  ADMIN_PERMISSIONS: '/admin/permissions',
+  ADMIN_ORDERS: '/admin/orders',
+  ADMIN_DASHBOARD: '/admin/dashboard',
 
   // 其他
   NOT_FOUND: '/404'
