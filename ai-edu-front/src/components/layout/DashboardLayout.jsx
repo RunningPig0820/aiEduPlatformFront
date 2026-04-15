@@ -34,7 +34,7 @@ export function DashboardLayout({ menuItems, title, roleColor = 'primary' }) {
     <div className="drawer lg:drawer-open">
       <input id="sidebar-drawer" type="checkbox" className="drawer-toggle" />
 
-      <div className="drawer-content flex flex-col min-h-screen">
+      <div className="drawer-content flex flex-col h-screen">
         {/* 导航栏 */}
         <nav className="navbar bg-base-200 shadow-md sticky top-0 z-30">
           <div className="flex-none lg:hidden">
@@ -66,13 +66,13 @@ export function DashboardLayout({ menuItems, title, roleColor = 'primary' }) {
         </nav>
 
         {/* 主内容区 + AI 面板 */}
-        <div className="flex flex-1">
+        <div className="flex flex-1 min-h-0">
           <main className="flex-1 p-6 bg-base-100 overflow-auto">
             <Outlet />
           </main>
 
           {/* AI 助手面板 - 仅桌面端显示 */}
-          <div className="hidden lg:block">
+          <div className="hidden lg:block h-full">
             <AIChatPanel pageCode={getPageCode()} />
           </div>
         </div>

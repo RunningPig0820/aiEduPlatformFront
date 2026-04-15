@@ -38,8 +38,16 @@ export function Login() {
     confirmPassword: ''
   })
 
-  const { login, demoLogin, register, sendCode } = useAuth()
+  const { login, register, sendCode } = useAuth()
   const navigate = useNavigate()
+
+  // 演示账号配置
+  const DEMO_ACCOUNTS = {
+    STUDENT: { username: 'student', password: '123456' },
+    TEACHER: { username: 'teacher', password: '123456' },
+    PARENT: { username: 'parent', password: '123456' },
+    ADMIN: { username: 'admin', password: '123456' }
+  }
 
   // 弹窗提示
   const showModal = (type, text, title) => {
@@ -152,17 +160,18 @@ export function Login() {
     }
   }
 
-  // 演示登录
+  // 演示登录 - 使用真实账号密码
   const handleDemoLogin = async (role) => {
     setLoading(true)
     try {
-      await demoLogin(role)
-      showModal('success', '演示登录成功，正在跳转...')
+      const account = DEMO_ACCOUNTS[role]
+      const user = await login(account.username, account.password)
+      showModal('success', '登录成功，正在跳转...')
       setTimeout(() => {
-        redirectByRole(role)
+        redirectByRole(user.role)
       }, 1000)
     } catch (error) {
-      showModal('error', error.message || '演示登录失败')
+      showModal('error', error.message || '登录失败')
     } finally {
       setLoading(false)
     }

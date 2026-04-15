@@ -49,7 +49,18 @@ export async function chat(params) {
   })
 
   if (!response.ok) {
-    throw new Error(`对话请求失败: ${response.status}`)
+    // 尝试解析错误响应体
+    let errorMessage = `对话请求失败`
+    try {
+      const errorData = await response.json()
+      if (errorData.message) {
+        errorMessage = errorData.message
+      }
+    } catch {
+      // 无法解析 JSON，使用状态码
+      errorMessage = `对话请求失败: ${response.status}`
+    }
+    throw new Error(errorMessage)
   }
 
   const result = await response.json()
@@ -91,7 +102,18 @@ export function streamChat(params, onToken, onDone, onError) {
       })
 
       if (!response.ok) {
-        throw new Error(`流式对话请求失败: ${response.status}`)
+        // 尝试解析错误响应体
+        let errorMessage = `流式对话请求失败`
+        try {
+          const errorData = await response.json()
+          if (errorData.message) {
+            errorMessage = errorData.message
+          }
+        } catch {
+          // 无法解析 JSON，使用状态码
+          errorMessage = `流式对话请求失败: ${response.status}`
+        }
+        throw new Error(errorMessage)
       }
 
       const reader = response.body.getReader()

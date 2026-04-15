@@ -1,6 +1,11 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
 import { getPageMeta } from '../../constants/pageMeta'
 import { llmApi } from '../../api'
+import 'katex/dist/katex.min.css'
 
 /**
  * AI 助手面板组件
@@ -16,9 +21,9 @@ export function AIChatPanel({ pageCode, className = '' }) {
   const [models, setModels] = useState([])
   const [selectedModel, setSelectedModel] = useState(null)
   const [showModelSelector, setShowModelSelector] = useState(false)
-  const [error, setError] = useState(null)
   const messagesEndRef = useRef(null)
   const cancelRef = useRef(null)
+  const streamingContentRef = useRef('') // 用于追踪流式内容的最新值
 
   // 获取页面元信息
   const pageMeta = getPageMeta(pageCode)
@@ -73,7 +78,6 @@ export function AIChatPanel({ pageCode, className = '' }) {
     setMessages(prev => [...prev, userMessage])
     setInputValue('')
     setIsLoading(true)
-    setError(null)
     setStreamingContent('')
 
     // 构建请求参数
@@ -90,30 +94,41 @@ export function AIChatPanel({ pageCode, className = '' }) {
     }
 
     // 流式对话
+    streamingContentRef.current = ''
     cancelRef.current = llmApi.streamChat(
       params,
       // onToken
       (content) => {
+        streamingContentRef.current += content
         setStreamingContent(prev => prev + content)
       },
       // onDone
       (data) => {
+        const finalContent = streamingContentRef.current
+        const modelUsed = data.model_used || data.modelUsed
         const aiMessage = {
           id: Date.now() + 1,
           role: 'assistant',
-          content: streamingContent + data.usage ? ` (模型: ${data.modelUsed})` : '',
+          content: finalContent,
           timestamp: new Date(),
-          modelUsed: data.modelUsed,
+          modelUsed,
           usage: data.usage
         }
-        setMessages(prev => [...prev, { ...aiMessage, content: streamingContent }])
+        setMessages(prev => [...prev, aiMessage])
         setStreamingContent('')
         setIsLoading(false)
         cancelRef.current = null
       },
-      // onError
+      // onError - 将错误以消息气泡形式展示
       (err) => {
-        setError(err.message)
+        const errorMessage = {
+          id: Date.now() + 1,
+          role: 'assistant',
+          content: `❌ ${err.message}`,
+          timestamp: new Date(),
+          isError: true
+        }
+        setMessages(prev => [...prev, errorMessage])
         setIsLoading(false)
         setStreamingContent('')
         cancelRef.current = null
@@ -121,18 +136,12 @@ export function AIChatPanel({ pageCode, className = '' }) {
     )
   }
 
-  // 重试
-  const handleRetry = () => {
-    setError(null)
-    handleSend()
-  }
-
   // 新对话
   const handleNewChat = () => {
     cancelRequest()
     setMessages([])
     setStreamingContent('')
-    setError(null)
+    streamingContentRef.current = ''
     setSessionId(llmApi.generateSessionId())
   }
 
@@ -261,7 +270,7 @@ export function AIChatPanel({ pageCode, className = '' }) {
           )}
 
           {/* 消息列表 */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-3">
+          <div className="flex-1 min-h-0 h-0 overflow-y-auto p-3 space-y-3">
             {messages.length === 0 && !streamingContent && (
               <div className="text-center text-base-content/50 text-sm py-8">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -286,10 +295,23 @@ export function AIChatPanel({ pageCode, className = '' }) {
                   className={`chat-bubble ${
                     message.role === 'user'
                       ? 'chat-bubble-primary'
-                      : 'chat-bubble-base-100'
+                      : message.isError
+                        ? 'chat-bubble-error'
+                        : 'bg-base-300'
                   }`}
                 >
-                  {message.content}
+                  {message.role === 'user' ? (
+                    message.content
+                  ) : (
+                    <div className="prose prose-sm max-w-none prose-p:text-base-content prose-headings:text-base-content prose-strong:text-base-content prose-code:text-base-content">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm, remarkMath]}
+                        rehypePlugins={[rehypeKatex]}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
+                  )}
                 </div>
                 <div className="chat-footer opacity-50 text-xs">
                   {formatTime(message.timestamp)}
@@ -300,27 +322,21 @@ export function AIChatPanel({ pageCode, className = '' }) {
             {/* 流式内容显示 */}
             {streamingContent && (
               <div className="chat chat-start">
-                <div className="chat-bubble bg-base-100 whitespace-pre-wrap">
-                  {streamingContent}
+                <div className="chat-bubble bg-base-300">
+                  <div className="prose prose-sm max-w-none prose-p:text-base-content prose-headings:text-base-content prose-strong:text-base-content prose-code:text-base-content">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm, remarkMath]}
+                      rehypePlugins={[rehypeKatex]}
+                    >
+                      {streamingContent}
+                    </ReactMarkdown>
+                  </div>
                   <span className="inline-block w-1 h-4 bg-primary animate-pulse ml-0.5"></span>
                 </div>
               </div>
             )}
 
-            {/* 错误显示 */}
-            {error && (
-              <div className="alert alert-error text-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <span>{error}</span>
-                <button className="btn btn-sm btn-ghost" onClick={handleRetry}>
-                  重试
-                </button>
-              </div>
-            )}
-
-            {isLoading && !streamingContent && !error && (
+            {isLoading && !streamingContent && (
               <div className="chat chat-start">
                 <div className="chat-bubble bg-base-100">
                   <span className="loading loading-dots loading-sm"></span>
