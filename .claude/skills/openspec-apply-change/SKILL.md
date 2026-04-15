@@ -66,11 +66,23 @@ metadata:
 
 6. **实现任务（循环直到完成或受阻）**
 
+   **开始前：读取语雀元数据**
+   - 读取本地 `tasks.md` 或 `design.md` 文件
+   - 解析文件底部的 `<!-- yuque-meta: {...} -->` 注释，获取：
+     - `repo_id`：语雀知识库 ID
+     - `tasks_doc_id`：语雀中 tasks 文档的 doc_id
+   - 如果没有找到 yuque-meta：说明该变更未经过 propose 流程的语雀同步，跳过所有语雀更新步骤
+
    对于每个待处理的任务：
    - 显示正在处理哪个任务
    - 进行所需的代码更改
    - 保持更改最小化和专注
-   - 在任务文件中标记任务完成：`- [ ]` → `- [x]`
+   - 在本地 tasks.md 文件中标记任务完成：`- [ ]` → `- [x]`
+   - **更新语雀任务状态**（如果存在 yuque-meta）：
+     - 读取当前语雀 tasks 文档：`mcp__yuque-mcp__yuque_get_doc(doc_id: tasks_doc_id, repo_id: repo_id)`
+     - 将对应的 `- [ ]` 替换为 `- [x]`
+     - 更新回语雀：`mcp__yuque-mcp__yuque_update_doc(doc_id: tasks_doc_id, body: 更新后的内容)`
+     - 这样保持语雀和本地 tasks.md 的同步
    - 继续下一个任务
 
    **在以下情况暂停：**
