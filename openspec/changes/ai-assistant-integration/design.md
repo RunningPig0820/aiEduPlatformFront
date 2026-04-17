@@ -88,3 +88,5 @@ export const PAGE_META = {
 **[风险] Token消耗** → 显示当前会话Token使用量（如果后端返回）
 
 **[权衡] 不持久化历史** → 简化实现，但用户体验略差
+
+<!-- yuque-meta: {"repo_id": "77888750", "product_dir": "llm 对接/设计方案", "change_dir_uuid": "jMY37HCusNPRLkMZ", "design_doc_id": 266174398, "proposal_doc_id": 266174463, "tasks_doc_id": 266174575, "tests_doc_id": 266174685} -->

@@ -45,6 +45,7 @@ export const ROUTES = {
   ADMIN_PERMISSIONS: '/admin/permissions',
   ADMIN_ORDERS: '/admin/orders',
   ADMIN_DASHBOARD: '/admin/dashboard',
+  ADMIN_KNOWLEDGE_GRAPH: '/admin/knowledge-graph',
 
   // 其他
   NOT_FOUND: '/404'
