@@ -1,6 +1,6 @@
 # 认证模块 API 接口文档
 
-> 基础路径: `/api/auth`
+> 基础路径: `/api/unauth`
 >
 > 更新日期: 2026-03-14
 
@@ -50,7 +50,7 @@
 | 项目 | 值 |
 |------|-----|
 | HTTP 方法 | `POST` |
-| 接口路径 | `/api/auth/register` |
+| 接口路径 | `/api/unauth/register` |
 | Content-Type | `application/json` |
 
 ### 请求参数 (RequestBody)
@@ -109,7 +109,7 @@
 
 **cURL:**
 ```bash
-curl -X POST http://localhost:8080/api/auth/register \
+curl -X POST http://localhost:8080/api/unauth/register \
   -H "Content-Type: application/json" \
   -d '{
     "username": "testuser",
@@ -123,7 +123,7 @@ curl -X POST http://localhost:8080/api/auth/register \
 
 **JavaScript (fetch):**
 ```javascript
-const response = await fetch('/api/auth/register', {
+const response = await fetch('/api/unauth/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -155,7 +155,7 @@ const result = await response.json();
 | 项目 | 值 |
 |------|-----|
 | HTTP 方法 | `POST` |
-| 接口路径 | `/api/auth/login` |
+| 接口路径 | `/api/unauth/login` |
 | Content-Type | `application/json` |
 
 ### 请求参数 (RequestBody)
@@ -236,7 +236,7 @@ const result = await response.json();
 
 **cURL (用户名密码登录):**
 ```bash
-curl -X POST http://localhost:8080/api/auth/login \
+curl -X POST http://localhost:8080/api/unauth/login \
   -H "Content-Type: application/json" \
   -c cookies.txt \
   -d '{
@@ -248,7 +248,7 @@ curl -X POST http://localhost:8080/api/auth/login \
 
 **cURL (手机号验证码登录):**
 ```bash
-curl -X POST http://localhost:8080/api/auth/login \
+curl -X POST http://localhost:8080/api/unauth/login \
   -H "Content-Type: application/json" \
   -c cookies.txt \
   -d '{
@@ -261,7 +261,7 @@ curl -X POST http://localhost:8080/api/auth/login \
 **JavaScript (fetch):**
 ```javascript
 // 用户名密码登录
-const response = await fetch('/api/auth/login', {
+const response = await fetch('/api/unauth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include', // 重要：携带 Cookie
@@ -292,7 +292,7 @@ const result = await response.json();
 | 项目 | 值 |
 |------|-----|
 | HTTP 方法 | `POST` |
-| 接口路径 | `/api/auth/demo-login` |
+| 接口路径 | `/api/unauth/demo-login` |
 | Content-Type | `application/json` |
 
 ### 请求参数 (RequestBody)
@@ -337,7 +337,7 @@ const result = await response.json();
 
 **cURL:**
 ```bash
-curl -X POST http://localhost:8080/api/auth/demo-login \
+curl -X POST http://localhost:8080/api/unauth/demo-login \
   -H "Content-Type: application/json" \
   -c cookies.txt \
   -d '{"role": "STUDENT"}'
@@ -345,7 +345,7 @@ curl -X POST http://localhost:8080/api/auth/demo-login \
 
 **JavaScript (fetch):**
 ```javascript
-const response = await fetch('/api/auth/demo-login', {
+const response = await fetch('/api/unauth/demo-login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -362,7 +362,7 @@ const response = await fetch('/api/auth/demo-login', {
 | 项目 | 值 |
 |------|-----|
 | HTTP 方法 | `POST` |
-| 接口路径 | `/api/auth/send-code` |
+| 接口路径 | `/api/unauth/send-code` |
 | Content-Type | `application/json` |
 
 ### 请求参数 (RequestBody)
@@ -413,14 +413,14 @@ const response = await fetch('/api/auth/demo-login', {
 
 **cURL:**
 ```bash
-curl -X POST http://localhost:8080/api/auth/send-code \
+curl -X POST http://localhost:8080/api/unauth/send-code \
   -H "Content-Type: application/json" \
   -d '{"phone": "13800138000", "scene": "REGISTER"}'
 ```
 
 **JavaScript (fetch):**
 ```javascript
-const response = await fetch('/api/auth/send-code', {
+const response = await fetch('/api/unauth/send-code', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -445,7 +445,7 @@ const response = await fetch('/api/auth/send-code', {
 | 项目 | 值 |
 |------|-----|
 | HTTP 方法 | `POST` |
-| 接口路径 | `/api/auth/reset-password` |
+| 接口路径 | `/api/unauth/reset-password` |
 | Content-Type | `application/json` |
 
 ### 请求参数 (RequestBody)
@@ -478,7 +478,7 @@ const response = await fetch('/api/auth/send-code', {
 
 **cURL:**
 ```bash
-curl -X POST http://localhost:8080/api/auth/reset-password \
+curl -X POST http://localhost:8080/api/unauth/reset-password \
   -H "Content-Type: application/json" \
   -d '{
     "phone": "13800138000",
@@ -489,7 +489,7 @@ curl -X POST http://localhost:8080/api/auth/reset-password \
 
 **JavaScript (fetch):**
 ```javascript
-const response = await fetch('/api/auth/reset-password', {
+const response = await fetch('/api/unauth/reset-password', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -516,7 +516,7 @@ const response = await fetch('/api/auth/reset-password', {
 | 项目 | 值 |
 |------|-----|
 | HTTP 方法 | `PUT` |
-| 接口路径 | `/api/auth/password` |
+| 接口路径 | `/api/unauth/password` |
 | Content-Type | `application/json` |
 | 需要登录 | 是 |
 
@@ -548,7 +548,7 @@ const response = await fetch('/api/auth/reset-password', {
 
 **cURL:**
 ```bash
-curl -X PUT http://localhost:8080/api/auth/password \
+curl -X PUT http://localhost:8080/api/unauth/password \
   -H "Content-Type: application/json" \
   -b cookies.txt \
   -d '{
@@ -559,7 +559,7 @@ curl -X PUT http://localhost:8080/api/auth/password \
 
 **JavaScript (fetch):**
 ```javascript
-const response = await fetch('/api/auth/password', {
+const response = await fetch('/api/unauth/password', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -587,7 +587,7 @@ const response = await fetch('/api/auth/password', {
 | 项目 | 值 |
 |------|-----|
 | HTTP 方法 | `POST` |
-| 接口路径 | `/api/auth/logout` |
+| 接口路径 | `/api/unauth/logout` |
 | 需要登录 | 是 |
 
 ### 请求参数
@@ -608,13 +608,13 @@ const response = await fetch('/api/auth/password', {
 
 **cURL:**
 ```bash
-curl -X POST http://localhost:8080/api/auth/logout \
+curl -X POST http://localhost:8080/api/unauth/logout \
   -b cookies.txt
 ```
 
 **JavaScript (fetch):**
 ```javascript
-const response = await fetch('/api/auth/logout', {
+const response = await fetch('/api/unauth/logout', {
     method: 'POST',
     credentials: 'include'
 });
@@ -629,7 +629,7 @@ const response = await fetch('/api/auth/logout', {
 | 项目 | 值 |
 |------|-----|
 | HTTP 方法 | `GET` |
-| 接口路径 | `/api/auth/current-user` |
+| 接口路径 | `/api/unauth/current-user` |
 | 需要登录 | 是 |
 
 ### 请求参数
@@ -658,13 +658,13 @@ const response = await fetch('/api/auth/logout', {
 
 **cURL:**
 ```bash
-curl -X GET http://localhost:8080/api/auth/current-user \
+curl -X GET http://localhost:8080/api/unauth/current-user \
   -b cookies.txt
 ```
 
 **JavaScript (fetch):**
 ```javascript
-const response = await fetch('/api/auth/current-user', {
+const response = await fetch('/api/unauth/current-user', {
     credentials: 'include'
 });
 const result = await response.json();
@@ -688,7 +688,7 @@ if (result.code === '00000') {
 | 项目 | 值 |
 |------|-----|
 | HTTP 方法 | `GET` |
-| 接口路径 | `/api/auth/user/{id}` |
+| 接口路径 | `/api/unauth/user/{id}` |
 
 ### 请求参数 (Path)
 
@@ -718,13 +718,13 @@ if (result.code === '00000') {
 
 **cURL:**
 ```bash
-curl -X GET http://localhost:8080/api/auth/user/1
+curl -X GET http://localhost:8080/api/unauth/user/1
 ```
 
 **JavaScript (fetch):**
 ```javascript
 const userId = 1;
-const response = await fetch(`/api/auth/user/${userId}`);
+const response = await fetch(`/api/unauth/user/${userId}`);
 const result = await response.json();
 ```
 
@@ -778,7 +778,7 @@ const result = await response.json();
 
 ```javascript
 // fetch 请求示例
-fetch('/api/auth/current-user', {
+fetch('/api/unauth/current-user', {
     credentials: 'include' // 重要：携带 Cookie
 });
 ```
@@ -796,25 +796,25 @@ fetch('/api/auth/current-user', {
 ### 3. 登录流程建议
 
 1. 用户选择登录方式（用户名密码 / 手机号密码 / 手机号验证码）
-2. 若选择验证码登录，先调用 `/api/auth/send-code` 发送验证码
-3. 调用 `/api/auth/login` 完成登录
+2. 若选择验证码登录，先调用 `/api/unauth/send-code` 发送验证码
+3. 调用 `/api/unauth/login` 完成登录
 4. 登录成功后保存用户信息到本地状态
 5. 后续请求携带 Cookie 即可
 
 ### 4. 注册流程建议
 
 1. 用户填写注册信息
-2. 调用 `/api/auth/send-code` 发送验证码（scene=REGISTER）
+2. 调用 `/api/unauth/send-code` 发送验证码（scene=REGISTER）
 3. 用户输入验证码
-4. 调用 `/api/auth/register` 完成注册
+4. 调用 `/api/unauth/register` 完成注册
 5. 注册成功后自动登录
 
 ### 5. 重置密码流程建议
 
 1. 用户输入手机号
-2. 调用 `/api/auth/send-code` 发送验证码（scene=RESET_PASSWORD）
+2. 调用 `/api/unauth/send-code` 发送验证码（scene=RESET_PASSWORD）
 3. 用户输入验证码和新密码
-4. 调用 `/api/auth/reset-password` 完成重置
+4. 调用 `/api/unauth/reset-password` 完成重置
 
 ---
 

@@ -100,9 +100,9 @@ npm run build:ssr
 
 | 接口 | 方法 | 说明 |
 |------|------|------|
-| `/api/auth/login` | POST | 登录 |
-| `/api/auth/demo-login` | POST | 演示登录 |
-| `/api/auth/register` | POST | 注册 |
-| `/api/auth/send-code` | POST | 发送验证码 |
-| `/api/auth/logout` | POST | 登出 |
-| `/api/auth/current-user` | GET | 获取当前用户 |
+| `/api/unauth/login` | POST | 登录 |
+| `/api/unauth/demo-login` | POST | 演示登录 |
+| `/api/unauth/register` | POST | 注册 |
+| `/api/unauth/send-code` | POST | 发送验证码 |
+| `/api/unauth/logout` | POST | 登出 |
+| `/api/unauth/current-user` | GET | 获取当前用户 |

@@ -3,7 +3,7 @@
  * 封装后端 LLM Gateway 接口
  */
 
-const BASE_URL = '/api/llm'
+const BASE_URL = '/api/auth/llm'
 
 /**
  * 获取允许调用的模型列表

@@ -1,8 +1,10 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { kgApi } from '@/api/modules/kg'
 
 // 节点类型常量
 const NODE_TYPES = {
+  SUBJECT: 'SUBJECT',
+  GRADE: 'GRADE',
   TEXTBOOK: 'TEXTBOOK',
   CHAPTER: 'CHAPTER',
   SECTION: 'SECTION',
@@ -11,6 +13,8 @@ const NODE_TYPES = {
 
 // 节点类型对应的 API 调用映射
 const NODE_CHILD_API = {
+  SUBJECT: { fn: kgApi.getGradesBySubject, param: 'subject' },
+  GRADE: { fn: kgApi.getTextbooksByGrade, param: 'grade' },
   TEXTBOOK: { fn: kgApi.getChapters, param: 'textbookUri' },
   CHAPTER: { fn: kgApi.getSections, param: 'chapterUri' },
   SECTION: { fn: kgApi.getPoints, param: 'sectionUri' },
@@ -18,6 +22,8 @@ const NODE_CHILD_API = {
 
 // 节点展开后的子类型
 const NODE_CHILD_TYPE = {
+  SUBJECT: NODE_TYPES.GRADE,
+  GRADE: NODE_TYPES.TEXTBOOK,
   TEXTBOOK: NODE_TYPES.CHAPTER,
   CHAPTER: NODE_TYPES.SECTION,
   SECTION: NODE_TYPES.POINT,
@@ -26,6 +32,18 @@ const NODE_CHILD_TYPE = {
 // 节点类型图标
 function NodeIcon({ type }) {
   switch (type) {
+    case NODE_TYPES.SUBJECT:
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+      )
+    case NODE_TYPES.GRADE:
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      )
     case NODE_TYPES.TEXTBOOK:
       return (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -51,6 +69,16 @@ function NodeIcon({ type }) {
     default:
       return null
   }
+}
+
+// 节点类型中文标签
+const NODE_TYPE_LABEL = {
+  [NODE_TYPES.SUBJECT]: '学科',
+  [NODE_TYPES.GRADE]: '年级',
+  [NODE_TYPES.TEXTBOOK]: '教材',
+  [NODE_TYPES.CHAPTER]: '章节',
+  [NODE_TYPES.SECTION]: '小节',
+  [NODE_TYPES.POINT]: '知识点',
 }
 
 /**
@@ -146,7 +174,12 @@ function TreeNode({ node, nodeType, level = 0, cache, selectedUri, onSelect }) {
         </span>
 
         {/* 节点名称 */}
-        <span className="truncate">{node.name}</span>
+        <span className="truncate">{node.label}</span>
+
+        {/* 节点类型标签 */}
+        <span className="ml-auto text-[10px] text-base-content/40 flex-shrink-0">
+          {NODE_TYPE_LABEL[nodeType]}
+        </span>
 
         {/* 加载状态 */}
         {loading && <span className="loading loading-spinner loading-xs ml-auto"></span>}
@@ -183,27 +216,29 @@ function TreeNode({ node, nodeType, level = 0, cache, selectedUri, onSelect }) {
 /**
  * 教材树形导航组件
  *
- * 功能：
+ * 导航层级：学科 → 年级 → 教材 → 章节 → 小节 → 知识点
  * - 逐级懒加载子节点
  * - 知识点节点点击触发选中
  * - 已展开节点数据缓存
- * - 加载失败重试
- * - 节点类型图标区分
  */
 function TextbookTree({ selectedUri, onSelect }) {
-  const [textbooks, setTextbooks] = useState([])
+  const [subjects, setSubjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   // 缓存：{ uri: [children] }
   const [cache] = useState({})
 
-  // 加载教材根节点
-  const loadTextbooks = useCallback(async () => {
+  // 加载学科根节点
+  const loadSubjects = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      const result = await kgApi.getTextbooks()
-      setTextbooks(Array.isArray(result) ? result : [])
+      const result = await kgApi.getSubjects()
+      const subjectNodes = Array.isArray(result) ? result.map((s, i) => ({
+        uri: s,
+        label: s,
+      })) : []
+      setSubjects(subjectNodes)
     } catch (err) {
       setError(err.message || '加载失败')
     } finally {
@@ -211,15 +246,15 @@ function TextbookTree({ selectedUri, onSelect }) {
     }
   }, [])
 
-  // 缓存失效：切换教材时清空
-  const handleTextbookChange = useCallback(() => {
+  // 缓存失效：刷新时清空
+  const handleRefresh = useCallback(() => {
     Object.keys(cache).forEach((key) => delete cache[key])
-    loadTextbooks()
-  }, [cache, loadTextbooks])
+    loadSubjects()
+  }, [cache, loadSubjects])
 
   // 首次加载
   const handleRetry = async () => {
-    await loadTextbooks()
+    await loadSubjects()
   }
 
   return (
@@ -229,8 +264,8 @@ function TextbookTree({ selectedUri, onSelect }) {
         <h2 className="text-sm font-semibold">教材导航</h2>
         <button
           className="btn btn-ghost btn-xs"
-          onClick={handleTextbookChange}
-          title="刷新教材列表"
+          onClick={handleRefresh}
+          title="刷新导航"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -256,13 +291,13 @@ function TextbookTree({ selectedUri, onSelect }) {
         )}
 
         {/* 树列表 */}
-        {!loading && !error && textbooks.length > 0 && (
+        {!loading && !error && subjects.length > 0 && (
           <ul role="tree" className="space-y-0.5">
-            {textbooks.map((textbook) => (
+            {subjects.map((subject) => (
               <TreeNode
-                key={textbook.uri}
-                node={textbook}
-                nodeType={NODE_TYPES.TEXTBOOK}
+                key={subject.uri}
+                node={subject}
+                nodeType={NODE_TYPES.SUBJECT}
                 cache={cache}
                 selectedUri={selectedUri}
                 onSelect={onSelect}
@@ -272,9 +307,9 @@ function TextbookTree({ selectedUri, onSelect }) {
         )}
 
         {/* 空状态 */}
-        {!loading && !error && textbooks.length === 0 && (
+        {!loading && !error && subjects.length === 0 && (
           <div className="text-center py-8 text-base-content/50 text-sm">
-            暂无教材数据
+            暂无导航数据
           </div>
         )}
       </div>

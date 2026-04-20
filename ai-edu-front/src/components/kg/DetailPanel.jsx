@@ -2,41 +2,6 @@ import { useState, useCallback } from 'react'
 import { kgApi } from '@/api/modules/kg'
 
 /**
- * 难度星级显示
- */
-function DifficultyStars({ level }) {
-  const fullStars = Math.floor(level) || 0
-  const hasHalfStar = level % 1 >= 0.5
-  const maxStars = 5
-
-  return (
-    <div className="flex items-center gap-0.5">
-      {Array.from({ length: maxStars }).map((_, i) => {
-        if (i < fullStars) {
-          return (
-            <svg key={i} className="w-4 h-4 text-warning" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-          )
-        }
-        if (i === fullStars && hasHalfStar) {
-          return (
-            <svg key={i} className="w-4 h-4 text-warning" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-          )
-        }
-        return (
-          <svg key={i} className="w-4 h-4 text-base-300" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-          </svg>
-        )
-      })}
-    </div>
-  )
-}
-
-/**
  * 复制 URI 按钮
  */
 function CopyUriButton({ uri }) {
@@ -95,17 +60,42 @@ function DetailField({ label, value }) {
 }
 
 /**
+ * 难度文字显示（后端返回字符串如 EASY/MEDIUM/HARD）
+ */
+function DifficultyText({ level }) {
+  const labelMap = {
+    EASY: '简单',
+    MEDIUM: '中等',
+    HARD: '困难'
+  }
+  return <span className="text-sm font-medium">{labelMap[level] || level || '-'}</span>
+}
+
+/**
+ * 重要性文字显示
+ */
+function ImportanceText({ level }) {
+  const labelMap = {
+    LOW: '低',
+    MEDIUM: '中',
+    HIGH: '高',
+    CORE: '核心'
+  }
+  return <span className="text-sm font-medium">{labelMap[level] || level || '-'}</span>
+}
+
+/**
  * 教材知识点详情面板
+ * 后端返回字段: uri, label, difficulty, importance, cognitiveLevel, sectionUri, sectionLabel, chapterUri, chapterLabel
  */
 function TextbookKPDetail({ data }) {
   return (
     <div className="flex flex-col gap-4">
-      <DetailField label="名称" value={data.name} />
-      <DetailField label="学科" value={data.subject} />
-      <DetailField label="年级" value={data.grade} />
-      <DetailField label="单元" value={data.unit} />
-      <DetailField label="课时" value={data.lesson} />
-      <DetailField label="难度" value={data.difficulty ? <DifficultyStars level={data.difficulty} /> : '-'} />
+      <DetailField label="名称" value={data.label} />
+      <DetailField label="章节" value={data.chapterLabel} />
+      <DetailField label="小节" value={data.sectionLabel} />
+      <DetailField label="难度" value={<DifficultyText level={data.difficulty} />} />
+      <DetailField label="重要性" value={<ImportanceText level={data.importance} />} />
       <DetailField label="认知层级" value={data.cognitiveLevel} />
       <div className="flex flex-col gap-0.5">
         <span className="text-xs text-base-content/50">URI</span>
@@ -117,13 +107,16 @@ function TextbookKPDetail({ data }) {
 
 /**
  * 知识点详情面板
+ * 后端返回字段: uri, label, difficulty, importance, cognitiveLevel, sectionUri, sectionLabel, chapterUri, chapterLabel
  */
 function KPDetail({ data }) {
   return (
     <div className="flex flex-col gap-4">
-      <DetailField label="名称" value={data.name} />
-      <DetailField label="学科" value={data.subject} />
-      <DetailField label="难度" value={data.difficulty ? <DifficultyStars level={data.difficulty} /> : '-'} />
+      <DetailField label="名称" value={data.label} />
+      <DetailField label="章节" value={data.chapterLabel} />
+      <DetailField label="小节" value={data.sectionLabel} />
+      <DetailField label="难度" value={<DifficultyText level={data.difficulty} />} />
+      <DetailField label="重要性" value={<ImportanceText level={data.importance} />} />
       <DetailField label="认知层级" value={data.cognitiveLevel} />
       <div className="flex flex-col gap-0.5">
         <span className="text-xs text-base-content/50">URI</span>

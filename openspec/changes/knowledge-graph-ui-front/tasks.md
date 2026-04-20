@@ -58,3 +58,42 @@
 - [x] 6.4 添加整体页面样式和响应式布局
 - [x] 6.5 添加全局错误边界捕获图谱渲染异常
 - [x] 6.6 配置路由 `/admin/knowledge-graph` 和权限拦截
+
+## 7. 知识图谱同步管理
+
+- [x] 7.1 创建同步 API 封装（`syncFull`、`getSyncStatus`、`getSyncRecords`）
+- [x] 7.2 实现同步状态页面入口（页面头部「同步」按钮）
+- [x] 7.3 实现同步状态展示面板（当前同步状态、最近同步时间、数量统计）
+- [x] 7.4 实现手动触发全量同步（教材/学科/年级下拉筛选）
+- [x] 7.5 实现同步记录列表（表格展示历史同步任务及状态）
+- [ ] 7.6 实现同步进行中状态提示（loading 动画 + 刷新按钮）
+- [ ] 7.7 实现同步失败错误详情展示
+
+## 8. 系统概览与统计
+
+- [x] 8.1 创建系统统计 API 封装（`getGradeStats`、`getGradeSystem`、`getNeo4jHealth`）
+- [ ] 8.2 实现学科体系查看页面（按年级展示知识点分组结构）
+- [x] 8.3 实现统计面板（教材数、章节数、小节数、知识点总数、难度分布）
+- [x] 8.4 实现 Neo4j 健康状态检查（连接状态、响应时间）
+- [x] 8.5 集成统计面板到知识图谱页面（顶部概览栏）
+
+## 9. 后端接口对齐（联调修复）
+
+- [ ] 9.1 修复：前端 `getGraphData` 接口后端未实现（`/knowledge-points/{uri}/graph`），需与后端确认图谱数据获取方式
+- [x] 9.2 修复：树节点字段从 `name` 改为 `label`（后端 `KgTextbookDTO`、`ChapterTreeNode`、`SectionNode` 均使用 `label`）
+- [x] 9.3 修复：知识点详情字段对齐 `KgKnowledgePointDetailDTO`（`difficulty`/`importance` 为字符串枚举，非数字）
+- [x] 9.4 新增：`batchGetConceptRelations` 批量关联接口前端封装和图谱使用集成
+
+## 10. 导航树层级优化
+
+- [x] 10.1 导航层级从「教材 → 章节 → 小节」调整为「学科 → 年级 → 教材 → 章节 → 小节 → 知识点」
+- [x] 10.2 创建新 API：`getSubjects`（学科列表）、`getGradesBySubject`、`getTextbooksByGrade`
+- [x] 10.3 树节点增加类型标签展示（学科/年级/教材/章节/小节/知识点）
+- [x] 10.4 节点图标按类型区分（学科、年级、教材各有专属图标）
+- [x] 10.5 同步对话框改为下拉选择（教材下拉放第一位置、学科下拉、年级下拉）
+- [ ] 10.6 联调后端新增接口：`GET /subjects`、`GET /subjects/{subject}/grades`、`GET /grades/{grade}/textbooks`
+
+## 11. 后端接口需求整理
+
+- [x] 11.1 整理后端缺失接口文档 `docs/kg-backend-requirements.md`（含接口路径、请求/响应格式、优先级）
+- [x] 11.2 提交后端需求文档与后端团队沟通

@@ -17,7 +17,7 @@ export const CodeScene = {
 export const authApi = {
   // 登录 - 用户名+密码
   login: (username, password) =>
-    request.post('/auth/login', {
+    request.post('/unauth/login', {
       loginType: LoginType.USERNAME_PASSWORD,
       username,
       password
@@ -25,7 +25,7 @@ export const authApi = {
 
   // 手机号+密码登录
   loginByPhonePassword: (phone, password) =>
-    request.post('/auth/login', {
+    request.post('/unauth/login', {
       loginType: LoginType.PHONE_PASSWORD,
       phone,
       password
@@ -33,7 +33,7 @@ export const authApi = {
 
   // 手机号+验证码登录
   loginByPhoneCode: (phone, code) =>
-    request.post('/auth/login', {
+    request.post('/unauth/login', {
       loginType: LoginType.PHONE_CODE,
       phone,
       code
@@ -41,35 +41,35 @@ export const authApi = {
 
   // 演示登录
   demoLogin: (role) =>
-    request.post('/auth/demo-login', { role }),
+    request.post('/unauth/demo-login', { role }),
 
   // 注册
   register: (data) =>
-    request.post('/auth/register', data),
+    request.post('/unauth/register', data),
 
   // 发送验证码 - 返回验证码字符串（开发环境自动填充）
   sendCode: (phone, scene) =>
-    request.post('/auth/send-code', { phone, scene }),
+    request.post('/unauth/send-code', { phone, scene }),
 
   // 获取当前用户
   getCurrentUser: () =>
-    request.get('/auth/current-user'),
+    request.get('/unauth/current-user'),
 
   // 获取用户信息
   getUserById: (id) =>
-    request.get(`/auth/user/${id}`),
+    request.get(`/unauth/user/${id}`),
 
   // 修改密码（需登录）
   changePassword: (oldPassword, newPassword) =>
-    request.put('/auth/password', { oldPassword, newPassword }),
+    request.put('/unauth/password', { oldPassword, newPassword }),
 
   // 重置密码
   resetPassword: (phone, code, newPassword) =>
-    request.post('/auth/reset-password', { phone, code, newPassword }),
+    request.post('/unauth/reset-password', { phone, code, newPassword }),
 
   // 登出
   logout: () =>
-    request.post('/auth/logout')
+    request.post('/unauth/logout')
 }
 
 export default authApi
