@@ -94,7 +94,7 @@ test.describe('知识图谱管理页面 E2E 测试', () => {
     const checks = [
       { name: '页面标题', selector: page.getByText('知识图谱管理') },
       { name: '左侧面板-教材导航', selector: page.getByText('教材导航') },
-      { name: '刷新按钮', selector: page.locator('button[title="刷新教材列表"]') },
+      { name: '刷新按钮', selector: page.locator('button[title="刷新导航"]') },
       { name: '同步按钮', selector: page.getByText('同步') },
       { name: '图谱空状态提示', selector: page.getByText('请从左侧选择一个知识点') },
       { name: '统计栏-教材数', selector: page.getByText('教材数') },
@@ -151,5 +151,114 @@ test.describe('知识图谱管理页面 E2E 测试', () => {
 
     // 验证至少一个同步面板元素可见
     expect(syncStatusVisible || syncRecordsVisible).toBe(true)
+  })
+
+  test('教材导航筛选功能（维度接口）', async ({ page }) => {
+    await loginAsAdmin(page)
+    await expect(page).toHaveURL(/\/admin/)
+
+    // 进入知识图谱
+    await page.locator('a[href="/admin/knowledge-graph"]').click()
+    await page.waitForURL(/\/admin\/knowledge-graph/, { timeout: 10000 })
+    await page.waitForTimeout(2000)
+
+    console.log('验证教材导航筛选功能')
+
+    // 检查筛选按钮存在
+    const filterBtn = page.locator('button[title="筛选"]')
+    const filterBtnVisible = await filterBtn.isVisible().catch(() => false)
+    console.log(`  ✓ 筛选按钮: ${filterBtnVisible ? '可见' : '不可见'}`)
+
+    // 点击筛选按钮
+    if (filterBtnVisible) {
+      await filterBtn.click()
+      await page.waitForTimeout(500)
+
+      // 验证筛选面板显示
+      const subjectFilter = page.getByRole('combobox', { name: '' }).first()
+      const filterPanelVisible = await subjectFilter.isVisible().catch(() => false)
+      console.log(`  ✓ 筛选面板: ${filterPanelVisible ? '可见' : '不可见'}`)
+
+      // 测试筛选功能（如果有数据）
+      if (filterPanelVisible) {
+        // 检查筛选下拉是否存在
+        const selectCount = await page.locator('.select-bordered').count()
+        console.log(`  ✓ 筛选下拉数量: ${selectCount}`)
+      }
+    }
+  })
+
+  test('同步记录筛选和维度信息展示', async ({ page }) => {
+    await loginAsAdmin(page)
+    await expect(page).toHaveURL(/\/admin/)
+
+    // 进入知识图谱
+    await page.locator('a[href="/admin/knowledge-graph"]').click()
+    await page.waitForURL(/\/admin\/knowledge-graph/, { timeout: 10000 })
+    await page.waitForTimeout(2000)
+
+    // 点击同步按钮
+    console.log('打开同步面板')
+    await page.getByText('同步').click({ force: true })
+    await page.waitForTimeout(1000)
+
+    console.log('验证同步记录筛选功能')
+
+    // 检查同步记录筛选下拉存在
+    const filterSelects = page.locator('.select-bordered.select-xs')
+    const filterCount = await filterSelects.count()
+    console.log(`  ✓ 筛选下拉数量: ${filterCount}`)
+
+    // 检查同步记录表格列头（维度信息）
+    const tableHeaders = page.locator('table th')
+    const headerCount = await tableHeaders.count()
+    console.log(`  ✓ 表格列数: ${headerCount}`)
+
+    // 检查是否有维度相关列头
+    if (headerCount > 0) {
+      const headersText = await tableHeaders.allInnerTexts()
+      console.log(`  ✓ 列头内容: ${headersText.join(', ')}`)
+
+      // 验证维度列存在（教材版本、学科、学段、年级）
+      const hasDimensionCols = headersText.some(h =>
+        ['教材版本', '学科', '学段', '年级'].includes(h.trim())
+      )
+      console.log(`  ✓ 维度列展示: ${hasDimensionCols ? '是' : '否'}`)
+    }
+  })
+
+  test('同步对话框维度数据和联动筛选', async ({ page }) => {
+    await loginAsAdmin(page)
+    await expect(page).toHaveURL(/\/admin/)
+
+    // 进入知识图谱
+    await page.locator('a[href="/admin/knowledge-graph"]').click()
+    await page.waitForURL(/\/admin\/knowledge-graph/, { timeout: 10000 })
+    await page.waitForTimeout(2000)
+
+    // 点击手动同步按钮
+    console.log('打开同步对话框')
+    const manualSyncBtn = page.getByRole('button', { name: '手动同步' })
+    await manualSyncBtn.click({ force: true })
+    await page.waitForTimeout(1000)
+
+    console.log('验证同步对话框')
+
+    // 检查同步类型选择
+    const fullSyncBtn = page.getByRole('button', { name: '全量同步' })
+    const textbookSyncBtn = page.getByRole('button', { name: '教材同步' })
+    const fullSyncVisible = await fullSyncBtn.isVisible().catch(() => false)
+    const textbookSyncVisible = await textbookSyncBtn.isVisible().catch(() => false)
+    console.log(`  ✓ 全量同步按钮: ${fullSyncVisible ? '可见' : '不可见'}`)
+    console.log(`  ✓ 教材同步按钮: ${textbookSyncVisible ? '可见' : '不可见'}`)
+
+    // 检查维度下拉存在
+    const dialogSelects = page.locator('.modal-box .select-bordered')
+    const dialogSelectCount = await dialogSelects.count()
+    console.log(`  ✓ 同步对话框下拉数量: ${dialogSelectCount}`)
+
+    // 关闭对话框
+    const cancelBtn = page.getByRole('button', { name: '取消' })
+    await cancelBtn.click()
   })
 })

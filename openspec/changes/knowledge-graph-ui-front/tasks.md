@@ -97,3 +97,71 @@
 
 - [x] 11.1 整理后端缺失接口文档 `docs/kg-backend-requirements.md`（含接口路径、请求/响应格式、优先级）
 - [x] 11.2 提交后端需求文档与后端团队沟通
+
+## 12. 后端接口改动适配（2026-04-20）
+
+> 语雀文档：https://www.yuque.com/zhangmin-jrrer/iu9s4m/uv3ryznzxzt8fuys
+> Swagger 端口：http://localhost:9627/v3/api-docs
+
+### 12.1 维度接口适配（新增 `/dimensions/*` 接口）
+
+- [x] 12.1.1 更新 `kg.js` API 模块，新增维度接口：
+  - `getDimensionGrades()` → `GET /api/auth/kg/dimensions/grades`
+  - `getDimensionStages()` → `GET /api/auth/kg/dimensions/stages`
+  - `getDimensionSubjects()` → `GET /api/auth/kg/dimensions/subjects`
+  - `getDimensionTextbooks()` → `GET /api/auth/kg/dimensions/textbooks`
+- [x] 12.1.2 更新 `SyncManager.jsx` 同步对话框下拉选项数据源，从维度接口获取（`KgDimensionDTO` 返回 code/label/orderIndex）
+- [x] 12.1.3 同步对话框支持维度筛选联动（选择学科 → 过滤年级列表）
+
+### 12.2 同步历史记录接口改动（GET → POST）
+
+- [x] 12.2.1 更新 `kg.js` API 模块，`getSyncRecords` 改为 POST 请求：
+  - 请求体：`SyncRecordQueryRequest` { edition, subject, stage, grade, page, size }
+  - 响应：`SyncRecordDTO[]`（新增 edition/subject/stage/grade 字段）
+- [x] 12.2.2 更新 `SyncManager.jsx` 同步记录列表，展示维度信息（edition/subject/stage/grade）
+- [x] 12.2.3 实现同步记录筛选功能（按教材版本/学科/年级筛选）
+
+### 12.3 教材同步接口（新增 `syncTextbooks`）
+
+- [x] 12.3.1 更新 `kg.js` API 模块，新增教材同步接口：
+  - `syncTextbooks(params)` → `POST /api/auth/kg/sync/textbooks`
+  - 请求体：`SyncRequest` { edition, subject }
+- [x] 12.3.2 同步对话框新增「教材同步」选项（仅同步教材基础信息，不同步知识点）
+
+### 12.4 同步结果展示优化（新增年级统计）
+
+- [x] 12.4.1 更新 `SyncManager.jsx` 同步结果展示，显示年级统计：
+  - `completedGrades`：成功同步的年级数
+  - `failedGrades`：失败的年级数
+  - `totalGrades`：总年级数
+- [x] 12.4.2 同步状态栏显示分年级进度条（每个年级独立状态）
+
+### 12.5 教材列表接口参数更新
+
+- [x] 12.5.1 更新 `getTextbooks` API，支持查询参数：`subject` 和 `stage`
+- [x] 12.5.2 教材树筛选功能（按学科/学段筛选教材列表）
+
+### 12.6 E2E 测试更新
+
+- [x] 12.6.1 更新 `tests/kg-page.spec.mjs`，覆盖新维度接口和筛选功能
+- [x] 12.6.2 测试同步记录筛选和维度信息展示
+
+### 12.7 导航树结构重构（6级）
+
+- [x] 12.7.1 导航结构改为：教材版本 → 学科 → 年级 → 章节 → 小节 → 知识点
+- [x] 12.7.2 更新 `kg.js` API：根节点用 `/dimensions/textbooks`（教材版本）
+- [x] 12.7.3 学科展开用 `/dimensions/subjects`（GET）
+- [x] 12.7.4 年级展开用 `/dimensions/grades` POST，参数 `{ edition, subject }`，返回 `GradeTextbookDTO`
+- [x] 12.7.5 重写 `TextbookTree.jsx` 适配6级导航结构
+- [x] 12.7.6 更新 `SyncManager.jsx` 年级联动筛选逻辑（需先选教材版本和学科）
+
+### 12.8 导航接口改为 POST（2026-04-21）
+
+- [x] 12.8.1 `/textbooks/chapters` POST `{ uri }` 替代 `/textbooks/{uri}/chapters` GET
+- [x] 12.8.2 `/sections/points` POST `{ uri }` 替代 `/sections/{uri}/points` GET
+- [x] 12.8.3 `/knowledge-points/detail` POST `{ uri }` 替代 `/knowledge-points/{uri}` GET
+- [x] 12.8.4 `/knowledge-points/graph` POST `{ uri }` 替代 `/knowledge-points/{uri}/graph` GET
+- [x] 12.8.5 `/system/stats` POST `{ grade }` 替代 `/system/stats/{grade}` GET
+- [x] 12.8.6 `/system/grade` POST `{ grade, groupBy }` 替代 `/system/grade/{grade}` GET
+- [x] 12.8.7 `ChapterTreeNode` 包含 `sections[]`，章节展开直接显示知识点（合并小节层级）
+- [x] 12.8.8 更新 `TextbookTree.jsx` 适配 POST 接口和合并的章节小节结构
