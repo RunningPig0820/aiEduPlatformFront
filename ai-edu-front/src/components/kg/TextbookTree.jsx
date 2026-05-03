@@ -1,13 +1,14 @@
 import { useState, useCallback, useEffect } from 'react'
 import { kgApi } from '@/api/modules/kg'
 
-// 节点类型常量（5级导航）
+// 节点类型常量（6级导航）
 const NODE_TYPES = {
   EDITION: 'EDITION',     // 教材版本（第1级）
   SUBJECT: 'SUBJECT',     // 学科（第2级）
   GRADE: 'GRADE',         // 年级（第3级，含 textbookUri）
-  CHAPTER: 'CHAPTER',     // 章节（第4级，含 sections）
-  POINT: 'POINT',         // 知识点（第5级）
+  CHAPTER: 'CHAPTER',     // 章节（第4级）
+  SECTION: 'SECTION',     // 小节（第5级）
+  POINT: 'POINT',         // 教材知识点（第6级）
 }
 
 // 节点展开后的子类型
@@ -15,7 +16,8 @@ const NODE_CHILD_TYPE = {
   EDITION: NODE_TYPES.SUBJECT,
   SUBJECT: NODE_TYPES.GRADE,
   GRADE: NODE_TYPES.CHAPTER,
-  CHAPTER: NODE_TYPES.POINT, // 章节展开直接显示知识点（sections 已合并）
+  CHAPTER: NODE_TYPES.SECTION,
+  SECTION: NODE_TYPES.POINT,
 }
 
 // 节点类型图标
@@ -45,6 +47,12 @@ function NodeIcon({ type }) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
         </svg>
       )
+    case NODE_TYPES.SECTION:
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      )
     case NODE_TYPES.POINT:
       return (
         <span className="inline-block w-2.5 h-2.5 rounded-full bg-primary"></span>
@@ -60,7 +68,8 @@ const NODE_TYPE_LABEL = {
   [NODE_TYPES.SUBJECT]: '学科',
   [NODE_TYPES.GRADE]: '年级',
   [NODE_TYPES.CHAPTER]: '章节',
-  [NODE_TYPES.POINT]: '知识点',
+  [NODE_TYPES.SECTION]: '小节',
+  [NODE_TYPES.POINT]: '教材知识点',
 }
 
 /**
@@ -112,49 +121,32 @@ function TreeNode({ node, nodeType, cache, selectedUri, onSelect, parentContext 
           subject: node.code,
         }))
       } else if (nodeType === NODE_TYPES.GRADE) {
-        // 年级 → 章节（含小节）
+        // 年级 → 章节
         const result = await kgApi.getChapters(node.textbookUri || node.uri)
-        // 章节树直接包含小节，展开时先显示章节，章节再展开显示知识点
         childNodes = (Array.isArray(result) ? result : []).map((ch, i) => ({
           uri: ch.uri,
           label: ch.label,
           orderIndex: ch.orderIndex || i,
-          sections: ch.sections || [], // 小节列表
-          edition: node.edition,
-          subject: node.subject,
-          grade: node.grade,
+          chapterUri: ch.uri,
         }))
       } else if (nodeType === NODE_TYPES.CHAPTER) {
-        // 章节 → 知识点（从 sections 获取）
-        // 先检查 node.sections 是否存在，如果没有则加载
-        if (node.sections && node.sections.length > 0) {
-          // 章节下的小节，需要逐个小节加载知识点
-          // 这里简化处理：直接从第一个小节加载知识点
-          const allPoints = []
-          for (const section of node.sections) {
-            try {
-              const points = await kgApi.getPoints(section.uri)
-              if (Array.isArray(points)) {
-                allPoints.push(...points)
-              }
-            } catch (e) {
-              console.error('加载小节知识点失败:', section.uri, e)
-            }
-          }
-          childNodes = allPoints.map((p, i) => ({
-            uri: p.uri,
-            label: p.label || p.name,
-            ...p,
-          }))
-        } else {
-          // 没有 sections 信息，直接用 chapterUri 尝试（兜底）
-          const result = await kgApi.getPoints(node.uri)
-          childNodes = (Array.isArray(result) ? result : []).map((p, i) => ({
-            uri: p.uri,
-            label: p.label || p.name,
-            ...p,
-          }))
-        }
+        // 章节 → 小节
+        const result = await kgApi.getSections(node.chapterUri || node.uri)
+        childNodes = (Array.isArray(result) ? result : []).map((sec, i) => ({
+          uri: sec.uri,
+          label: sec.label,
+          orderIndex: sec.orderIndex || i,
+          sectionUri: sec.uri,
+          knowledgePointCount: sec.knowledgePointCount,
+        }))
+      } else if (nodeType === NODE_TYPES.SECTION) {
+        // 小节 → 知识点
+        const result = await kgApi.getPoints(node.sectionUri || node.uri)
+        childNodes = (Array.isArray(result) ? result : []).map((p, i) => ({
+          uri: p.uri,
+          label: p.label || p.name,
+          ...p,
+        }))
       }
 
       setChildren(childNodes)
@@ -199,7 +191,6 @@ function TreeNode({ node, nodeType, cache, selectedUri, onSelect, parentContext 
     ...parentContext,
     edition: node.edition || parentContext?.edition,
     subject: node.subject || parentContext?.subject || (nodeType === NODE_TYPES.SUBJECT ? node.code : undefined),
-    grade: node.grade || parentContext?.grade,
   }
 
   return (
@@ -232,6 +223,11 @@ function TreeNode({ node, nodeType, cache, selectedUri, onSelect, parentContext 
         {/* 节点名称 */}
         <span className="truncate">{node.label}</span>
 
+        {/* 小节知识点数量 */}
+        {nodeType === NODE_TYPES.SECTION && node.knowledgePointCount > 0 && (
+          <span className="text-xs text-base-content/40">({node.knowledgePointCount})</span>
+        )}
+
         {/* 节点类型标签 */}
         <span className="ml-auto text-[10px] text-base-content/40 flex-shrink-0">
           {NODE_TYPE_LABEL[nodeType]}
@@ -254,7 +250,7 @@ function TreeNode({ node, nodeType, cache, selectedUri, onSelect, parentContext 
         <ul className="ml-2 border-l border-base-300 pl-2" role="group">
           {children.map((child) => (
             <TreeNode
-              key={child.uri || child.code || child.grade}
+              key={child.uri || child.code || child.label}
               node={child}
               nodeType={childType}
               cache={cache}
@@ -272,7 +268,7 @@ function TreeNode({ node, nodeType, cache, selectedUri, onSelect, parentContext 
 /**
  * 教材树形导航组件
  *
- * 导航层级（5级）：教材版本 → 学科 → 年级 → 章节(含小节) → 知识点
+ * 导航层级（6级）：教材版本 → 学科 → 年级 → 章节 → 小节 → 知识点
  * - 逐级懒加载子节点
  * - 知识点节点点击触发选中
  * - 已展开节点数据缓存

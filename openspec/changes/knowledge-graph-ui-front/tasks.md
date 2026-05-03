@@ -157,11 +157,53 @@
 
 ### 12.8 导航接口改为 POST（2026-04-21）
 
-- [x] 12.8.1 `/textbooks/chapters` POST `{ uri }` 替代 `/textbooks/{uri}/chapters` GET
-- [x] 12.8.2 `/sections/points` POST `{ uri }` 替代 `/sections/{uri}/points` GET
-- [x] 12.8.3 `/knowledge-points/detail` POST `{ uri }` 替代 `/knowledge-points/{uri}` GET
-- [x] 12.8.4 `/knowledge-points/graph` POST `{ uri }` 替代 `/knowledge-points/{uri}/graph` GET
-- [x] 12.8.5 `/system/stats` POST `{ grade }` 替代 `/system/stats/{grade}` GET
-- [x] 12.8.6 `/system/grade` POST `{ grade, groupBy }` 替代 `/system/grade/{grade}` GET
-- [x] 12.8.7 `ChapterTreeNode` 包含 `sections[]`，章节展开直接显示知识点（合并小节层级）
-- [x] 12.8.8 更新 `TextbookTree.jsx` 适配 POST 接口和合并的章节小节结构
+- [x] 12.8.1 `/textbooks/chapters` POST `{ textbookUri }` 替代 `/textbooks/{uri}/chapters` GET
+- [x] 12.8.2 `/chapters/sections` POST `{ chapterUri }` 新增小节接口
+- [x] 12.8.3 `/sections/points` POST `{ sectionUri }` 替代 `/sections/{uri}/points` GET
+- [x] 12.8.4 `/knowledge-points/detail` POST `{ kpUri }` 替代 `/knowledge-points/{uri}` GET
+- [x] 12.8.5 `/knowledge-points/graph` POST `{ kpUri }` 替代 `/knowledge-points/{uri}/graph` GET
+- [x] 12.8.6 `/system/stats` POST `{ grade }` 替代 `/system/stats/{grade}` GET
+- [x] 12.8.7 `/system/grade` POST `{ grade, groupBy }` 替代 `/system/grade/{grade}` GET
+- [x] 12.8.8 恢复完整6级导航：教材版本 → 学科 → 年级 → 章节 → 小节 → 知识点
+
+## 13. 图谱节点点击展开（Neo4j 式交互）
+
+> 语雀文档：https://www.yuque.com/zhangmin-jrrer/iu9s4m/tr6ngub7ld6kxvmb
+> 后端接口：POST /api/auth/kg/graph/expand/structure 和 /knowledge
+
+### 13.1 API 封装
+
+- [x] 13.1.1 新增 `expandStructure(nodeUri, limit)` → `POST /auth/kg/graph/expand/structure`
+- [x] 13.1.2 新增 `expandKnowledge(nodeUri, limit)` → `POST /auth/kg/graph/expand/knowledge`
+
+### 13.2 节点类型系统
+
+- [x] 13.2.1 新增 8 种节点类型的视觉配置（kp/concept/statement/class/section/chapter/textbook/textbook_kp/unknown）
+- [x] 13.2.2 每种节点类型不同颜色边框、背景、徽章
+- [x] 13.2.3 注册所有节点类型到 React Flow nodeTypes
+
+### 13.3 边关系样式
+
+- [x] 13.3.1 结构关系（IN_UNIT, CONTAINS）：虚线 + 靛蓝色
+- [x] 13.3.2 知识关系（MATCHES_KG, RELATED_TO 等）：实线 + 琥珀色
+- [x] 13.3.3 边标签显示关系类型，带背景色块
+
+### 13.4 展开交互
+
+- [x] 13.4.1 每个节点底部显示「+结构」和「+知识」展开按钮
+- [x] 13.4.2 点击展开按钮调用对应 API，合并新节点/边到图谱
+- [x] 13.4.3 新节点环形布局在源节点周围（角度偏移避免重叠）
+- [x] 13.4.4 已展开节点按钮切换为「↻结构」/「↻知识」
+- [x] 13.4.5 已展开同类型节点不重复展开
+- [x] 13.4.6 使用 useRef 避免闭包过期问题
+
+### 13.5 hasMore 分页
+
+- [x] 13.5.1 已展开节点显示「···」加载更多按钮（hasMore 为 true 时）
+- [x] 13.5.2 加载更多使用较大 limit (50)
+
+### 13.6 图谱 UI 增强
+
+- [x] 13.6.1 左下角图例面板（边关系图例 + 节点类型徽章）
+- [x] 13.6.2 Tooltip 悬停显示节点类型、名称、URI
+- [x] 13.6.3 切换知识点时清空展开状态

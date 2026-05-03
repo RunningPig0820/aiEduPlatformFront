@@ -41,32 +41,50 @@ export const kgApi = {
   // ========== 教材导航（POST） ==========
 
   // 获取教材下章节列表（导航第4级）
-  // 请求: { uri: string }  // textbookUri
-  // 响应: ChapterTreeNode[] { uri, label, orderIndex, sections[] }
+  // 请求: { textbookUri: string }
+  // 响应: ChapterTreeNode[] { uri, label, orderIndex }
   getChapters: (textbookUri) =>
-    request.post('/auth/kg/textbooks/chapters', { uri: textbookUri }),
+    request.post('/auth/kg/textbooks/chapters', { textbookUri }),
 
-  // 获取小节下知识点列表（导航第5级）
-  // 请求: { uri: string }  // sectionUri
+  // 获取章节下小节列表（导航第5级）
+  // 请求: { chapterUri: string }
+  // 响应: SectionNode[] { uri, label, orderIndex, knowledgePointCount }
+  getSections: (chapterUri) =>
+    request.post('/auth/kg/chapters/sections', { chapterUri }),
+
+  // 获取小节下知识点列表（导航第6级）
+  // 请求: { sectionUri: string }
   // 响应: KgKnowledgePointDetailDTO[]
   getPoints: (sectionUri) =>
-    request.post('/auth/kg/sections/points', { uri: sectionUri }),
+    request.post('/auth/kg/sections/points', { sectionUri }),
 
   // ========== 知识点详情（POST） ==========
 
   // 获取知识点详情
-  // 请求: { uri: string }
+  // 请求: { kpUri: string }
   // 响应: KgKnowledgePointDetailDTO
-  getPointDetail: (uri) =>
-    request.post('/auth/kg/knowledge-points/detail', { uri }),
+  getPointDetail: (kpUri) =>
+    request.post('/auth/kg/knowledge-points/detail', { kpUri }),
 
   // ========== 图谱关系（POST） ==========
 
   // 获取知识点关联图谱数据
-  // 请求: { uri: string }
-  // 响应: KgGraphDTO { nodes[], edges[] }
-  getGraphData: (uri) =>
-    request.post('/auth/kg/knowledge-points/graph', { uri }),
+  // 请求: { kpUri: string }
+  // 响应: KgGraphDTO { nodes[], edges[], hasMore }
+  getGraphData: (kpUri) =>
+    request.post('/auth/kg/knowledge-points/graph', { kpUri }),
+
+  // 展开图谱节点的结构关系（IN_UNIT, CONTAINS）
+  // 请求: { nodeUri: string, limit?: number }
+  // 响应: KgGraphDTO { nodes[], edges[], hasMore }
+  expandStructure: (nodeUri, limit = 20) =>
+    request.post('/auth/kg/graph/expand/structure', { nodeUri, limit }),
+
+  // 展开图谱节点的知识关系（MATCHES_KG, RELATED_TO, BELONGS_TO 等）
+  // 请求: { nodeUri: string, limit?: number }
+  // 响应: KgGraphDTO { nodes[], edges[], hasMore }
+  expandKnowledge: (nodeUri, limit = 20) =>
+    request.post('/auth/kg/graph/expand/knowledge', { nodeUri, limit }),
 
   // 批量获取知识点关联关系
   batchGetConceptRelations: (uris) =>
