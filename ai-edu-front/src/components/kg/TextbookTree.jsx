@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { kgApi } from '@/api/modules/kg'
+import { BookOpen, Layers, CalendarDays, FolderOpen, FileText, Dot, ChevronRight, RefreshCw } from 'lucide-react'
 
 // 节点类型常量（6级导航）
 const NODE_TYPES = {
@@ -22,41 +23,20 @@ const NODE_CHILD_TYPE = {
 
 // 节点类型图标
 function NodeIcon({ type }) {
+  const size = 16
   switch (type) {
     case NODE_TYPES.EDITION:
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-      )
+      return <BookOpen size={size} strokeWidth={1.5} />
     case NODE_TYPES.SUBJECT:
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-        </svg>
-      )
+      return <Layers size={size} strokeWidth={1.5} />
     case NODE_TYPES.GRADE:
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      )
+      return <CalendarDays size={size} strokeWidth={1.5} />
     case NODE_TYPES.CHAPTER:
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-        </svg>
-      )
+      return <FolderOpen size={size} strokeWidth={1.5} />
     case NODE_TYPES.SECTION:
-      return (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      )
+      return <FileText size={size} strokeWidth={1.5} />
     case NODE_TYPES.POINT:
-      return (
-        <span className="inline-block w-2.5 h-2.5 rounded-full bg-primary"></span>
-      )
+      return <Dot size={16} strokeWidth={1.5} className="text-primary" />
     default:
       return null
   }
@@ -196,8 +176,8 @@ function TreeNode({ node, nodeType, cache, selectedUri, onSelect, parentContext 
   return (
     <li>
       <div
-        className={`flex items-center gap-2 py-1.5 px-2 rounded-lg cursor-pointer transition-colors text-sm
-          ${isSelected ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-base-300'}
+        className={`flex items-center gap-2 py-1.5 px-2 rounded-md cursor-pointer transition-colors text-sm
+          ${isSelected ? 'bg-primary/15 text-primary font-semibold ring-1 ring-primary/10' : 'hover:bg-base-300'}
           ${isLeaf ? 'pl-2' : ''}`}
         onClick={!isLeaf ? handleToggle : handleClick}
         role="treeitem"
@@ -205,13 +185,9 @@ function TreeNode({ node, nodeType, cache, selectedUri, onSelect, parentContext 
       >
         {/* 展开箭头 */}
         {!isLeaf && (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
+          <ChevronRight
             className={`h-3 w-3 transition-transform ${expanded ? 'rotate-90' : ''}`}
-            fill="none" viewBox="0 0 24 24" stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-          </svg>
+          />
         )}
         {isLeaf && <span className="w-3"></span>}
 
@@ -326,9 +302,7 @@ function TextbookTree({ selectedUri, onSelect }) {
           onClick={handleRefresh}
           title="刷新导航"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
+          <RefreshCw size={12} />
         </button>
       </div>
 

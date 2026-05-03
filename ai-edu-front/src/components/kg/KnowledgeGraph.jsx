@@ -59,7 +59,7 @@ function KGNode({ id, data, type }) {
   const noExpand = !canStructure && !canKnowledge // 叶子节点：不显示按钮区
 
   return (
-    <div className={`relative border-2 rounded-lg px-3 py-2 min-w-[110px] shadow-sm hover:shadow-md transition-shadow ${style.border} ${style.bg}`}>
+    <div className={`relative border-2 rounded-lg px-3 py-2 min-w-[110px] shadow-sm hover:shadow-lg transition-shadow duration-200 ${style.border} ${style.bg}`}>
       {/* 左侧连接点：跨列边目标端（如 章节←教材） */}
       <Handle type="target" position={Position.Left} id="left" className="!bg-gray-400" />
       {/* 上侧连接点：同列边目标端（如同类型节点下→上连接） */}
@@ -75,36 +75,36 @@ function KGNode({ id, data, type }) {
 
       {/* 展开按钮区：不支持的类型不显示按钮 */}
       {!noExpand && (
-        <div className="flex gap-1 mt-1.5 pt-1.5 border-t border-gray-200/50 justify-center">
+        <div className="flex gap-1 mt-1.5 pt-1.5 border-t border-base-200 justify-center">
           {/* 结构按钮 */}
           {canStructure ? (
             <button
-              className="btn btn-xs bg-indigo-50 hover:bg-indigo-200 border-indigo-200 text-indigo-600 text-[10px] h-5 min-h-0 px-1.5"
+              className="btn btn-xs bg-primary/5 hover:bg-primary/10 border-primary/20 text-primary text-[10px] h-5 min-h-0 px-1.5 rounded-md"
               onClick={(e) => { e.stopPropagation(); data.onExpand?.(id, 'structure') }}
               title="展开结构关系（IN_UNIT, CONTAINS）"
             >
               {isExpanded && (expandType === 'structure' || expandType === 'both') ? '↻结构' : '+结构'}
             </button>
           ) : (
-            <span className="btn btn-xs bg-gray-100 border-gray-200 text-gray-300 text-[10px] h-5 min-h-0 px-1.5 cursor-not-allowed" title="此类型不支持结构展开">+结构</span>
+            <span className="btn btn-xs bg-base-100 border-base-200 text-base-content/20 text-[10px] h-5 min-h-0 px-1.5 cursor-not-allowed rounded-md" title="此类型不支持结构展开">+结构</span>
           )}
 
           {/* 知识按钮 */}
           {canKnowledge ? (
             <button
-              className="btn btn-xs bg-amber-50 hover:bg-amber-200 border-amber-200 text-amber-600 text-[10px] h-5 min-h-0 px-1.5"
+              className="btn btn-xs bg-warning/5 hover:bg-warning/10 border-warning/20 text-warning text-[10px] h-5 min-h-0 px-1.5 rounded-md"
               onClick={(e) => { e.stopPropagation(); data.onExpand?.(id, 'knowledge') }}
               title="展开知识关系（MATCHES_KG, RELATED_TO 等）"
             >
               {isExpanded && (expandType === 'knowledge' || expandType === 'both') ? '↻知识' : '+知识'}
             </button>
           ) : (
-            <span className="btn btn-xs bg-gray-100 border-gray-200 text-gray-300 text-[10px] h-5 min-h-0 px-1.5 cursor-not-allowed" title="此类型不支持知识展开">+知识</span>
+            <span className="btn btn-xs bg-base-100 border-base-200 text-base-content/20 text-[10px] h-5 min-h-0 px-1.5 cursor-not-allowed rounded-md" title="此类型不支持知识展开">+知识</span>
           )}
 
           {isExpanded && data.hasMore && (
             <button
-              className="btn btn-xs bg-gray-50 hover:bg-gray-200 border-gray-200 text-gray-500 text-[10px] h-5 min-h-0 px-1.5"
+              className="btn btn-xs bg-base-100 hover:bg-base-200 border-base-200 text-base-content/60 text-[10px] h-5 min-h-0 px-1.5 rounded-md"
               onClick={(e) => { e.stopPropagation(); data.onLoadMore?.(id) }}
               title="加载更多"
             >
@@ -696,7 +696,7 @@ function KnowledgeGraph({ selectedPoint, onNodeSelect }) {
 
         {/* 图例 + 节点统计 */}
         <Panel position="bottom-left">
-          <div className="bg-base-100/90 backdrop-blur shadow-sm rounded p-2 text-[10px] space-y-1">
+          <div className="bg-base-100/90 backdrop-blur shadow-card-elevated rounded-lg p-2 text-[10px] space-y-1">
             <div className="font-semibold text-xs mb-1">图例</div>
             <div className="flex items-center gap-1.5">
               <span className="w-3 h-0.5 bg-indigo-500" style={{ borderTop: '2px dashed #6366f1' }}></span>
@@ -718,7 +718,7 @@ function KnowledgeGraph({ selectedPoint, onNodeSelect }) {
         {/* 工具按钮：节点数量 + 重新布局 + 简化视图 */}
         {nodes.length > 0 && (
           <Panel position="bottom-right">
-            <div className="flex items-center gap-2 bg-base-100/90 backdrop-blur shadow-sm rounded px-2 py-1 text-xs">
+            <div className="flex items-center gap-2 bg-base-100/90 backdrop-blur shadow-card-elevated rounded-lg px-2 py-1 text-xs">
               <span className="text-base-content/60">{nodes.length} 个节点</span>
               <button className="btn btn-xs btn-ghost text-[10px] h-6 min-h-0 px-1.5" onClick={handleReLayout} title="dagre 重新排版">
                 ⟳ 重排

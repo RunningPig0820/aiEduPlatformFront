@@ -1,13 +1,14 @@
 import { useState, useCallback, useEffect } from 'react'
 import { kgApi } from '@/api/modules/kg'
+import { BookOpen, FolderOpen, FileText, Zap, Server } from 'lucide-react'
 
 /**
  * 统计卡片
  */
 function StatCard({ icon, label, value, color = 'primary' }) {
   return (
-    <div className="flex items-center gap-3 bg-base-100 rounded-lg border border-base-300 p-3">
-      <div className={`p-2 rounded-lg bg-${color}/10`}>
+    <div className="flex items-center gap-3 bg-base-100 rounded-lg shadow-sm border border-base-200 p-3 hover:shadow transition-shadow">
+      <div className={`p-2 rounded-lg bg-${color}/10 ring-1 ring-${color}/20`}>
         {icon}
       </div>
       <div>
@@ -27,7 +28,7 @@ function DifficultyBar({ distribution }) {
   const maxVal = Math.max(...Object.values(distribution), 1)
 
   return (
-    <div className="bg-base-100 rounded-lg border border-base-300 p-3">
+    <div className="bg-base-100 rounded-lg shadow-sm border border-base-200 p-3">
       <h4 className="text-xs font-semibold text-base-content/50 mb-2">难度分布</h4>
       <div className="flex flex-col gap-1.5">
         {Object.entries(distribution).map(([level, count]) => (
@@ -56,6 +57,7 @@ function HealthStatus({ health }) {
   return (
     <div className={`flex items-center gap-2 text-xs px-3 py-1.5 rounded-full ${health.available ? 'bg-success/10 text-success' : 'bg-error/10 text-error'}`}>
       <span className={`inline-block w-2 h-2 rounded-full ${health.available ? 'bg-success' : 'bg-error'}`}></span>
+      <Server size={12} />
       <span>Neo4j {health.available ? '连接正常' : '连接异常'}</span>
       {health.responseTimeMs != null && <span className="opacity-60">({health.responseTimeMs}ms)</span>}
     </div>
@@ -111,38 +113,22 @@ function SystemStats() {
       <div className="flex items-center justify-between px-4 py-2">
         <div className="grid grid-cols-5 gap-3 flex-1">
           <StatCard
-            icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            }
+            icon={<BookOpen size={20} strokeWidth={1.5} className="text-primary" />}
             label="教材数"
             value={stats?.totalTextbooks}
           />
           <StatCard
-            icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-              </svg>
-            }
+            icon={<FolderOpen size={20} strokeWidth={1.5} className="text-secondary" />}
             label="章节数"
             value={stats?.totalChapters}
           />
           <StatCard
-            icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            }
+            icon={<FileText size={20} strokeWidth={1.5} className="text-accent" />}
             label="小节数"
             value={stats?.totalSections}
           />
           <StatCard
-            icon={
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-info" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            }
+            icon={<Zap size={20} strokeWidth={1.5} className="text-info" />}
             label="知识点总数"
             value={stats?.totalKnowledgePoints}
           />

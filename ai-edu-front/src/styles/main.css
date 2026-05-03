@@ -3,8 +3,10 @@
 @tailwind utilities;
 
 /* 自定义样式 */
+
+/* 登录页背景 — 品牌渐变 */
 .auth-bg {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4F46E5 0%, #0D9488 100%);
   min-height: 100vh;
 }
 
@@ -14,8 +16,8 @@
 }
 
 .tab-active {
-  border-bottom: 3px solid #667eea;
-  color: #667eea;
+  border-bottom: 3px solid #4F46E5;
+  color: #4F46E5;
   font-weight: 600;
 }
 
@@ -32,7 +34,7 @@
   justify-content: center;
   width: 40px;
   height: 48px;
-  color: #667eea;
+  color: #4F46E5;
   flex-shrink: 0;
 }
 
@@ -50,7 +52,7 @@
 }
 
 .input-suffix-btn:hover {
-  color: #667eea;
+  color: #4F46E5;
 }
 
 /* 通用布局 */
@@ -64,7 +66,7 @@
 
 /* 卡片样式 */
 .stat-card {
-  @apply card bg-base-100 shadow-md hover:shadow-lg transition-shadow;
+  @apply card bg-base-100 shadow-card-elevated hover:shadow-card-hover transition-all;
 }
 
 /* 表格样式 */
@@ -87,3 +89,26 @@
 .animate-fadeIn {
   animation: fadeIn 0.2s ease-out;
 }
+
+/* 页面内容淡入动画 */
+.page-enter {
+  animation: pageFadeIn 300ms ease-out forwards;
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hero 区域 staggered fadeIn */
+.hero .animate-fadeIn:nth-child(1) { animation-delay: 0ms; }
+.hero .animate-fadeIn:nth-child(2) { animation-delay: 100ms; }
+.hero .animate-fadeIn:nth-child(3) { animation-delay: 200ms; }
+.hero .animate-fadeIn:nth-child(4) { animation-delay: 300ms; }
+.hero .animate-fadeIn:nth-child(5) { animation-delay: 400ms; }

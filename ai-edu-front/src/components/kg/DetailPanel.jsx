@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { kgApi } from '@/api/modules/kg'
+import { Copy, Check, Target } from 'lucide-react'
 
 /**
  * 复制 URI 按钮
@@ -35,13 +36,9 @@ function CopyUriButton({ uri }) {
     >
       <span className="truncate max-w-[180px]">{uri}</span>
       {copied ? (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-        </svg>
+        <Check size={12} className="text-success" />
       ) : (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-        </svg>
+        <Copy size={12} />
       )}
     </button>
   )
@@ -52,9 +49,9 @@ function CopyUriButton({ uri }) {
  */
 function DetailField({ label, value }) {
   return (
-    <div className="flex flex-col gap-0.5">
-      <span className="text-xs text-base-content/50">{label}</span>
-      <span className="text-sm font-medium">{value || '-'}</span>
+    <div className="flex flex-col gap-0.5 p-3 rounded-lg bg-base-100 border border-base-200">
+      <span className="text-xs text-base-content/50 font-medium">{label}</span>
+      <span className="text-sm">{value || '-'}</span>
     </div>
   )
 }
@@ -90,15 +87,27 @@ function ImportanceText({ level }) {
  */
 function TextbookKPDetail({ data }) {
   return (
-    <div className="flex flex-col gap-4">
-      <DetailField label="名称" value={data.label} />
-      <DetailField label="章节" value={data.chapterLabel} />
-      <DetailField label="小节" value={data.sectionLabel} />
-      <DetailField label="难度" value={<DifficultyText level={data.difficulty} />} />
-      <DetailField label="重要性" value={<ImportanceText level={data.importance} />} />
-      <DetailField label="认知层级" value={data.cognitiveLevel} />
-      <div className="flex flex-col gap-0.5">
-        <span className="text-xs text-base-content/50">URI</span>
+    <div className="flex flex-col gap-2">
+      <div className="grid grid-cols-2 gap-2">
+        <DetailField label="名称" value={data.label} />
+        <DetailField label="章节" value={data.chapterLabel} />
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <DetailField label="小节" value={data.sectionLabel} />
+        <DetailField label="认知层级" value={data.cognitiveLevel} />
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div className="p-3 rounded-lg bg-base-100 border border-base-200 flex flex-col gap-0.5">
+          <span className="text-xs text-base-content/50 font-medium">难度</span>
+          <DifficultyText level={data.difficulty} />
+        </div>
+        <div className="p-3 rounded-lg bg-base-100 border border-base-200 flex flex-col gap-0.5">
+          <span className="text-xs text-base-content/50 font-medium">重要性</span>
+          <ImportanceText level={data.importance} />
+        </div>
+      </div>
+      <div className="p-3 rounded-lg bg-base-100 border border-base-200 flex flex-col gap-0.5">
+        <span className="text-xs text-base-content/50 font-medium">URI</span>
         <CopyUriButton uri={data.uri} />
       </div>
     </div>
@@ -111,15 +120,27 @@ function TextbookKPDetail({ data }) {
  */
 function KPDetail({ data }) {
   return (
-    <div className="flex flex-col gap-4">
-      <DetailField label="名称" value={data.label} />
-      <DetailField label="章节" value={data.chapterLabel} />
-      <DetailField label="小节" value={data.sectionLabel} />
-      <DetailField label="难度" value={<DifficultyText level={data.difficulty} />} />
-      <DetailField label="重要性" value={<ImportanceText level={data.importance} />} />
-      <DetailField label="认知层级" value={data.cognitiveLevel} />
-      <div className="flex flex-col gap-0.5">
-        <span className="text-xs text-base-content/50">URI</span>
+    <div className="flex flex-col gap-2">
+      <div className="grid grid-cols-2 gap-2">
+        <DetailField label="名称" value={data.label} />
+        <DetailField label="章节" value={data.chapterLabel} />
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <DetailField label="小节" value={data.sectionLabel} />
+        <DetailField label="认知层级" value={data.cognitiveLevel} />
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div className="p-3 rounded-lg bg-base-100 border border-base-200 flex flex-col gap-0.5">
+          <span className="text-xs text-base-content/50 font-medium">难度</span>
+          <DifficultyText level={data.difficulty} />
+        </div>
+        <div className="p-3 rounded-lg bg-base-100 border border-base-200 flex flex-col gap-0.5">
+          <span className="text-xs text-base-content/50 font-medium">重要性</span>
+          <ImportanceText level={data.importance} />
+        </div>
+      </div>
+      <div className="p-3 rounded-lg bg-base-100 border border-base-200 flex flex-col gap-0.5">
+        <span className="text-xs text-base-content/50 font-medium">URI</span>
         <CopyUriButton uri={data.uri} />
       </div>
     </div>
@@ -139,20 +160,7 @@ function DetailPanel({ selectedNode, nodeType }) {
   if (!selectedNode) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-base-content/50 p-6">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-12 w-12 mb-3 opacity-50"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.5"
-            d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"
-          />
-        </svg>
+        <Target size={48} className="mb-3 opacity-50" />
         <p className="text-sm text-center">请选择一个节点查看详情</p>
       </div>
     )
@@ -163,7 +171,7 @@ function DetailPanel({ selectedNode, nodeType }) {
   return (
     <div className="flex flex-col h-full">
       {/* 标题 */}
-      <div className="px-4 py-3 border-b border-base-300 bg-base-100">
+      <div className="px-4 py-3 border-b border-base-300 bg-base-100 rounded-t-lg">
         <h3 className="text-sm font-semibold">
           {isTextbookKP ? '教材知识点详情' : '知识点详情'}
         </h3>

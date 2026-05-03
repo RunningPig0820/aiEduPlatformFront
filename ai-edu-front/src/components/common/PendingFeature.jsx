@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AlertTriangle, Lock } from 'lucide-react'
 
 /**
  * 待开发功能提示 Toast
@@ -11,9 +12,11 @@ export function showPendingToast() {
   toast.className = 'alert alert-warning shadow-lg mb-2 animate-pulse'
   toast.innerHTML = `
     <div>
-      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
+      <div class="stroke-current flex-shrink-0 h-6 w-6">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
       <div>
         <h3 class="font-bold">功能开发中</h3>
         <div class="text-xs">该功能正在开发中，敬请期待...</div>
@@ -70,9 +73,7 @@ export function PendingFeature({ children, className = '', showLabel = true }) {
       {children}
       {showLabel && (
         <span className="badge badge-sm badge-ghost gap-1 ml-2">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-          </svg>
+          <Lock size={12} />
           待开发
         </span>
       )}

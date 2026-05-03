@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { authApi } from '../../api'
+import { Menu, Key, LogOut, CheckCircle, AlertTriangle } from 'lucide-react'
 
-export function Navbar({ title, roleColor = 'primary' }) => {
+export function Navbar({ title, roleColor = 'primary' }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [showChangePassword, setShowChangePassword] = useState(false)
@@ -73,9 +74,7 @@ export function Navbar({ title, roleColor = 'primary' }) => {
       <nav className="navbar bg-base-200 shadow-md">
         <div className="flex-none lg:hidden">
           <label htmlFor="sidebar-drawer" className="btn btn-square btn-ghost drawer-button">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-5 h-5 stroke-current">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
-            </svg>
+            <Menu size={20} strokeWidth={1.5} className="stroke-current" />
           </label>
         </div>
         <div className="flex-1">
@@ -97,17 +96,13 @@ export function Navbar({ title, roleColor = 'primary' }) => {
               <li className="border-t border-base-200"></li>
               <li>
                 <a onClick={() => setShowChangePassword(true)}>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                  </svg>
+                  <Key size={16} strokeWidth={1.5} />
                   修改密码
                 </a>
               </li>
               <li>
                 <a onClick={handleLogout} className="text-error">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
+                  <LogOut size={16} strokeWidth={1.5} />
                   退出登录
                 </a>
               </li>
@@ -118,7 +113,7 @@ export function Navbar({ title, roleColor = 'primary' }) => {
 
       {/* 修改密码模态框 */}
       {showChangePassword && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 animate-fadeIn">
           <div className="modal-box">
             <h3 className="font-bold text-lg mb-4">修改密码</h3>
             <form onSubmit={handleChangePassword} className="space-y-4">
@@ -172,13 +167,9 @@ export function Navbar({ title, roleColor = 'primary' }) => {
                 <div className={`alert ${message.type === 'success' ? 'alert-success' : 'alert-error'} shadow-lg`}>
                   <div className="flex items-center gap-2">
                     {message.type === 'success' ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                      </svg>
+                      <CheckCircle size={24} strokeWidth={1.5} />
                     ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                      </svg>
+                      <AlertTriangle size={24} strokeWidth={1.5} />
                     )}
                     <span className="font-medium">{message.text}</span>
                   </div>

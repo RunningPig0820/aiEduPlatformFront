@@ -5,6 +5,7 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import { getPageMeta } from '../../constants/pageMeta'
 import { llmApi } from '../../api'
+import { Monitor, Plus, ChevronRight, ChevronLeft, Send, MessageSquare, Bot, Sparkles, Check, Clock, ChevronDown } from 'lucide-react'
 import 'katex/dist/katex.min.css'
 
 /**
@@ -124,7 +125,7 @@ export function AIChatPanel({ pageCode, className = '' }) {
         const errorMessage = {
           id: Date.now() + 1,
           role: 'assistant',
-          content: `❌ ${err.message}`,
+          content: err.message,
           timestamp: new Date(),
           isError: true
         }
@@ -169,7 +170,7 @@ export function AIChatPanel({ pageCode, className = '' }) {
   return (
     <div
       className={`
-        flex flex-col h-full bg-base-200 border-l border-base-300
+        flex flex-col h-full bg-base-100 border-l border-base-300
         transition-all duration-300 ease-in-out
         ${className}
       `}
@@ -179,17 +180,15 @@ export function AIChatPanel({ pageCode, className = '' }) {
       {isExpanded ? (
         <>
           {/* 头部 */}
-          <div className="flex items-center justify-between p-3 border-b border-base-300">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-content" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-base-300">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                <Bot size={18} className="text-white" />
               </div>
               <div>
                 <h3 className="font-semibold text-sm">AI 助手</h3>
                 {pageMeta && (
-                  <p className="text-xs text-base-content/60">{pageMeta.name}</p>
+                  <p className="text-xs text-base-content/50">{pageMeta.name}</p>
                 )}
               </div>
             </div>
@@ -200,9 +199,7 @@ export function AIChatPanel({ pageCode, className = '' }) {
                 onClick={handleNewChat}
                 title="新对话"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                </svg>
+                <Plus size={18} />
               </button>
               {/* 收起按钮 */}
               <button
@@ -210,56 +207,60 @@ export function AIChatPanel({ pageCode, className = '' }) {
                 onClick={() => setIsExpanded(false)}
                 title="收起"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                </svg>
+                <ChevronRight size={18} />
               </button>
             </div>
           </div>
 
           {/* 模型选择器 */}
-          <div className="relative border-b border-base-300">
+          <div className="relative border-b border-base-300 px-4 py-2">
             <button
-              className="w-full flex items-center justify-between p-2 text-sm hover:bg-base-300/50"
+              className="w-full flex items-center justify-between px-2 py-1.5 text-sm rounded-lg hover:bg-base-200 transition-colors"
               onClick={() => setShowModelSelector(!showModelSelector)}
             >
-              <span className="text-base-content/70">
-                模型: {selectedModel?.displayName || '默认'}
-                {selectedModel?.free && <span className="text-success ml-1">(免费)</span>}
-              </span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
+              <div className="flex items-center gap-2">
+                <Sparkles size={14} className="text-primary" />
+                <span className="text-base-content/70 font-medium">
+                  {selectedModel?.displayName || '默认模型'}
+                </span>
+                {selectedModel?.free && (
+                  <span className="badge badge-success badge-xs">免费</span>
+                )}
+              </div>
+              <ChevronDown size={14} className={`text-base-content/50 transition-transform ${showModelSelector ? 'rotate-180' : ''}`} />
             </button>
 
             {showModelSelector && (
-              <div className="absolute left-0 right-0 top-full z-10 bg-base-100 border border-base-300 rounded-b shadow-lg max-h-60 overflow-y-auto">
-                {models.map((model) => (
-                  <button
-                    key={model.fullName}
-                    className={`w-full flex items-center justify-between p-2 text-sm hover:bg-base-200 ${
-                      selectedModel?.fullName === model.fullName ? 'bg-base-200' : ''
-                    }`}
-                    onClick={() => handleSelectModel(model)}
-                  >
-                    <div>
-                      <span>{model.displayName}</span>
-                      {model.free && <span className="text-success ml-1">(免费)</span>}
-                    </div>
-                    {selectedModel?.fullName === model.fullName && (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                  </button>
-                ))}
-              </div>
+              <>
+                {/* 遮罩 - 点击关闭 */}
+                <div className="fixed inset-0 z-10" onClick={() => setShowModelSelector(false)}></div>
+                <div className="absolute left-4 right-4 top-full z-20 bg-base-100 border border-base-300 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+                  {models.map((model) => (
+                    <button
+                      key={model.fullName}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 text-sm hover:bg-base-200 transition-colors rounded-t-lg first:rounded-t-lg last:rounded-b-lg ${
+                        selectedModel?.fullName === model.fullName ? 'bg-primary/5' : ''
+                      }`}
+                      onClick={() => handleSelectModel(model)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Sparkles size={14} className="text-primary" />
+                        <span className="font-medium">{model.displayName}</span>
+                        {model.free && <span className="badge badge-success badge-xs">免费</span>}
+                      </div>
+                      {selectedModel?.fullName === model.fullName && (
+                        <Check size={16} className="text-primary" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </>
             )}
           </div>
 
           {/* 页面功能提示 */}
           {pageMeta && pageMeta.features && pageMeta.features.length > 0 && (
-            <div className="p-2 bg-base-300/50 text-xs text-base-content/70">
+            <div className="px-4 py-2 bg-base-200/50 text-xs text-base-content/60 border-b border-base-300">
               <p className="font-medium mb-1">当前页面功能：</p>
               <ul className="list-disc list-inside space-y-0.5">
                 {pageMeta.features.slice(0, 3).map((feature, index) => (
@@ -270,17 +271,15 @@ export function AIChatPanel({ pageCode, className = '' }) {
           )}
 
           {/* 消息列表 */}
-          <div className="flex-1 min-h-0 h-0 overflow-y-auto p-3 space-y-3">
+          <div className="flex-1 min-h-0 h-0 overflow-y-auto px-4 py-3 space-y-4">
             {messages.length === 0 && !streamingContent && (
-              <div className="text-center text-base-content/50 text-sm py-8">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                <p>开始与 AI 助手对话</p>
+              <div className="text-center text-base-content/50 text-sm py-10">
+                <MessageSquare size={48} className="mx-auto mb-3 opacity-30" />
+                <p className="font-medium">开始与 AI 助手对话</p>
                 {pageMeta?.aiPrompts?.length > 0 && (
-                  <div className="mt-2 text-xs">
-                    <p className="font-medium">试试问我：</p>
-                    <p className="mt-1 text-primary">{pageMeta.aiPrompts[0]}</p>
+                  <div className="mt-3 px-4 py-3 bg-base-200 rounded-lg text-xs">
+                    <p className="font-medium mb-1">试试问我：</p>
+                    <p className="text-primary/80">{pageMeta.aiPrompts[0]}</p>
                   </div>
                 )}
               </div>
@@ -289,56 +288,75 @@ export function AIChatPanel({ pageCode, className = '' }) {
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`chat ${message.role === 'user' ? 'chat-end' : 'chat-start'}`}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <div
-                  className={`chat-bubble ${
-                    message.role === 'user'
-                      ? 'chat-bubble-primary'
-                      : message.isError
-                        ? 'chat-bubble-error'
-                        : 'bg-base-300'
-                  }`}
-                >
-                  {message.role === 'user' ? (
-                    message.content
-                  ) : (
-                    <div className="prose prose-sm max-w-none prose-p:text-base-content prose-headings:text-base-content prose-strong:text-base-content prose-code:text-base-content">
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm, remarkMath]}
-                        rehypePlugins={[rehypeKatex]}
-                      >
-                        {message.content}
-                      </ReactMarkdown>
+                {/* AI 消息 */}
+                {message.role === 'user' ? (
+                  /* 用户消息气泡 */
+                  <div className="max-w-[85%]">
+                    <div className="bg-primary text-primary-content rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm leading-relaxed break-words">
+                      {message.content}
                     </div>
-                  )}
-                </div>
-                <div className="chat-footer opacity-50 text-xs">
-                  {formatTime(message.timestamp)}
-                </div>
+                    <div className="flex items-center justify-end gap-1 mt-1 text-xs text-base-content/40">
+                      <Clock size={10} />
+                      <span>{formatTime(message.timestamp)}</span>
+                    </div>
+                  </div>
+                ) : (
+                  /* AI 消息气泡 */
+                  <div className="max-w-[85%]">
+                    <div className={`rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm leading-relaxed border-l-[3px] ${
+                      message.isError
+                        ? 'bg-error/5 border-error text-error'
+                        : 'bg-base-200 border-primary'
+                    }`}>
+                      {message.isError ? (
+                        <p>{message.content}</p>
+                      ) : (
+                        <div className="prose prose-sm max-w-none prose-p:text-sm prose-p:my-1 prose-headings:text-base-content prose-strong:text-base-content prose-code:text-base-content prose-code:bg-neutral/10 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-neutral prose-pre:text-neutral-content prose-pre:rounded-md prose-pre:max-h-64 prose-pre:overflow-auto">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm, remarkMath]}
+                            rehypePlugins={[rehypeKatex]}
+                          >
+                            {message.content}
+                          </ReactMarkdown>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 mt-1 text-xs text-base-content/40">
+                      <Clock size={10} />
+                      <span>{formatTime(message.timestamp)}</span>
+                      {message.modelUsed && (
+                        <span className="ml-2 text-base-content/30">· {message.modelUsed}</span>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
 
             {/* 流式内容显示 */}
             {streamingContent && (
-              <div className="chat chat-start">
-                <div className="chat-bubble bg-base-300">
-                  <div className="prose prose-sm max-w-none prose-p:text-base-content prose-headings:text-base-content prose-strong:text-base-content prose-code:text-base-content">
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm, remarkMath]}
-                      rehypePlugins={[rehypeKatex]}
-                    >
-                      {streamingContent}
-                    </ReactMarkdown>
+              <div className="flex justify-start">
+                <div className="max-w-[85%]">
+                  <div className="rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm leading-relaxed bg-base-200 border-l-[3px] border-primary">
+                    <div className="prose prose-sm max-w-none prose-p:text-sm prose-p:my-1 prose-headings:text-base-content prose-strong:text-base-content prose-code:text-base-content prose-code:bg-neutral/10 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-neutral prose-pre:text-neutral-content prose-pre:rounded-md prose-pre:max-h-64 prose-pre:overflow-auto">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm, remarkMath]}
+                        rehypePlugins={[rehypeKatex]}
+                      >
+                        {streamingContent}
+                      </ReactMarkdown>
+                    </div>
+                    <span className="inline-block w-1.5 h-4 bg-primary animate-pulse ml-0.5 align-middle"></span>
                   </div>
-                  <span className="inline-block w-1 h-4 bg-primary animate-pulse ml-0.5"></span>
                 </div>
               </div>
             )}
 
             {isLoading && !streamingContent && (
-              <div className="chat chat-start">
-                <div className="chat-bubble bg-base-100">
+              <div className="flex justify-start">
+                <div className="bg-base-200 rounded-2xl rounded-tl-sm px-4 py-3 border-l-[3px] border-primary">
                   <span className="loading loading-dots loading-sm"></span>
                 </div>
               </div>
@@ -348,25 +366,30 @@ export function AIChatPanel({ pageCode, className = '' }) {
           </div>
 
           {/* 输入区域 */}
-          <div className="p-3 border-t border-base-300">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="输入消息..."
-                className="input input-sm input-bordered flex-1"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                disabled={isLoading}
-              />
+          <div className="p-4 border-t border-base-300">
+            <div className="flex gap-2 items-end">
+              <div className="flex-1 bg-base-200 rounded-xl px-3 py-1 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
+                <textarea
+                  placeholder="输入消息..."
+                  className="w-full bg-transparent border-none outline-none resize-none text-sm py-2 max-h-24"
+                  rows={1}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault()
+                      handleSend()
+                    }
+                  }}
+                  disabled={isLoading}
+                />
+              </div>
               <button
-                className="btn btn-sm btn-primary"
+                className={`btn btn-primary btn-circle btn-sm h-9 w-9 ${!inputValue.trim() || isLoading ? 'btn-disabled' : 'hover:scale-105 transition-transform'}`}
                 onClick={handleSend}
                 disabled={!inputValue.trim() || isLoading}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
+                <Send size={16} />
               </button>
             </div>
           </div>
@@ -387,9 +410,7 @@ export function AIChatPanel({ pageCode, className = '' }) {
             onClick={() => setIsExpanded(true)}
             title="展开 AI 助手"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-            </svg>
+            <ChevronLeft size={20} />
           </button>
         </>
       )}

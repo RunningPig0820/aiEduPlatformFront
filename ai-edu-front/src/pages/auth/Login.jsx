@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { CodeScene, LoginType } from '../../api/modules/auth'
 import { authApi } from '../../api'
+import { User, Lock, Shield, Eye, EyeOff, BookOpen, Newspaper, UsersRound, Settings, CheckCircle, AlertCircle, Phone, IdCard, KeyRound, Sparkles, GraduationCap, Heart, Monitor } from 'lucide-react'
 
 export function Login() {
   const [activeTab, setActiveTab] = useState('login') // login | register | reset
@@ -14,7 +15,7 @@ export function Login() {
 
   // 登录表单
   const [loginForm, setLoginForm] = useState({
-    identifier: '', // 用户名或手机号
+    identifier: '',
     password: '',
     code: ''
   })
@@ -80,7 +81,7 @@ export function Login() {
       const code = await sendCode(phone, scene)
       showModal('success', '验证码已发送')
       startCountdown()
-      return code // 返回验证码用于自动填充
+      return code
     } catch (error) {
       showModal('error', error.message || '发送失败')
       return null
@@ -110,7 +111,6 @@ export function Login() {
       const identifier = loginForm.identifier.trim()
 
       if (loginMode === 'code') {
-        // 手机号+验证码登录
         if (!isPhoneNumber(identifier)) {
           showModal('error', '请输入正确的手机号')
           setLoading(false)
@@ -123,7 +123,6 @@ export function Login() {
         }
         user = await authApi.loginByPhoneCode(identifier, loginForm.code)
       } else {
-        // 密码登录（自动判断用户名或手机号）
         if (!identifier || !loginForm.password) {
           showModal('error', '请填写完整信息')
           setLoading(false)
@@ -155,12 +154,11 @@ export function Login() {
     }
     const code = await handleSendCode(loginForm.identifier, CodeScene.LOGIN)
     if (code) {
-      // 自动填入验证码
       setLoginForm({ ...loginForm, code: String(code) })
     }
   }
 
-  // 演示登录 - 使用真实账号密码
+  // 演示登录
   const handleDemoLogin = async (role) => {
     setLoading(true)
     try {
@@ -181,7 +179,6 @@ export function Login() {
   const handleRegisterSendCode = async () => {
     const code = await handleSendCode(registerForm.phone, CodeScene.REGISTER)
     if (code) {
-      // 自动填入验证码
       setRegisterForm({ ...registerForm, code: String(code) })
     }
   }
@@ -190,7 +187,6 @@ export function Login() {
   const handleRegister = async (e) => {
     e.preventDefault()
 
-    // 校验
     if (!registerForm.username || registerForm.username.length < 3) {
       showModal('error', '用户名至少3个字符')
       return
@@ -239,7 +235,6 @@ export function Login() {
   const handleResetSendCode = async () => {
     const code = await handleSendCode(resetForm.phone, CodeScene.RESET_PASSWORD)
     if (code) {
-      // 自动填入验证码
       setResetForm({ ...resetForm, code: String(code) })
     }
   }
@@ -287,602 +282,583 @@ export function Login() {
     navigate(routes[role] || '/')
   }
 
+  // 角色选项配置
+  const ROLE_OPTIONS = [
+    { value: 'STUDENT', label: '学生', icon: BookOpen, color: 'btn-success' },
+    { value: 'TEACHER', label: '教师', icon: Newspaper, color: 'btn-primary' },
+    { value: 'PARENT', label: '家长', icon: UsersRound, color: 'btn-warning' },
+    { value: 'ADMIN', label: '管理员', icon: Settings, color: 'btn-secondary' }
+  ]
+
+  // 演示登录配置
+  const DEMO_BUTTONS = [
+    { role: 'STUDENT', label: '学生', icon: BookOpen, btnClass: 'btn-success' },
+    { role: 'TEACHER', label: '老师', icon: Newspaper, btnClass: 'btn-primary' },
+    { role: 'PARENT', label: '家长', icon: UsersRound, btnClass: 'btn-warning' },
+    { role: 'ADMIN', label: '管理员', icon: Settings, btnClass: 'btn-secondary' }
+  ]
+
   return (
-    <div className="glass-card rounded-2xl shadow-2xl w-full max-w-md p-8">
-      {/* 标题 */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">
-          <span className="text-primary">AI</span> 教育平台
-        </h1>
-        <p className="text-gray-500 mt-2">智能学习，精准提升</p>
-      </div>
+    <div className="min-h-screen flex" style={{ background: 'linear-gradient(135deg, #EEF2FF 0%, #F0FDFA 100%)' }}>
+      {/* ===== 左侧品牌面板（lg 以上显示） ===== */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #4F46E5 0%, #0D9488 100%)' }}>
+        {/* 背景装饰 */}
+        <div className="absolute inset-0">
+          <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
+          <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-white/10 blur-3xl"></div>
+        </div>
 
-      {/* Tab 切换 */}
-      <div className="flex border-b border-gray-200 mb-6">
-        <button
-          className={`flex-1 py-3 text-center transition-colors ${activeTab === 'login' ? 'tab-active' : 'text-gray-500 hover:text-gray-700'}`}
-          onClick={() => setActiveTab('login')}
-        >
-          登录
-        </button>
-        <button
-          className={`flex-1 py-3 text-center transition-colors ${activeTab === 'register' ? 'tab-active' : 'text-gray-500 hover:text-gray-700'}`}
-          onClick={() => setActiveTab('register')}
-        >
-          注册
-        </button>
-      </div>
-
-      {/* 登录表单 */}
-      {activeTab === 'login' && (
-        <form onSubmit={handleLogin} className="space-y-4">
-          {/* 登录方式切换 */}
-          <div className="flex justify-center gap-4 mb-4">
-            <button
-              type="button"
-              className={`btn btn-sm ${loginMode === 'password' ? 'btn-primary' : 'btn-ghost'}`}
-              onClick={() => setLoginMode('password')}
-            >
-              密码登录
-            </button>
-            <button
-              type="button"
-              className={`btn btn-sm ${loginMode === 'code' ? 'btn-primary' : 'btn-ghost'}`}
-              onClick={() => setLoginMode('code')}
-            >
-              验证码登录
-            </button>
+        <div className="relative z-10 flex flex-col items-center justify-center w-full p-12 text-white">
+          {/* 大图标 */}
+          <div className="w-24 h-24 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mb-8 ring-4 ring-white/20">
+            <Sparkles size={48} strokeWidth={1.5} className="text-yellow-300" />
           </div>
 
-          {/* 用户名/手机号 */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium">
-                {loginMode === 'code' ? '手机号' : '手机号/用户名'}
-              </span>
-            </label>
-            <div className="input-wrapper">
-              <span className="input-prefix-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </span>
-              <input
-                type="text"
-                value={loginForm.identifier}
-                onChange={(e) => setLoginForm({ ...loginForm, identifier: e.target.value })}
-                placeholder={loginMode === 'code' ? '请输入手机号' : '请输入手机号或用户名'}
-                className="input input-bordered flex-1"
-                required
-              />
+          {/* 标语 */}
+          <h1 className="text-4xl font-extrabold mb-4">
+            <span className="text-yellow-300">AI</span> 教育平台
+          </h1>
+          <p className="text-lg text-white/80 text-center max-w-sm mb-12 leading-relaxed">
+            智能学习，精准提升。让每一位学生都能享受个性化学习。
+          </p>
+
+          {/* 特性 bullet */}
+          <div className="space-y-4 w-full max-w-xs">
+            {[
+              { icon: GraduationCap, text: '智能错题本 · 知识图谱' },
+              { icon: Monitor, text: '多端适配 · 随时随地学习' },
+              { icon: Heart, text: '家校互联 · 实时学情追踪' }
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-white/10 backdrop-blur-sm">
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+                  <item.icon size={20} />
+                </div>
+                <span className="text-white/90 text-sm">{item.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ===== 右侧表单区 ===== */}
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-10">
+        <div className="w-full max-w-md">
+          {/* 移动端 logo */}
+          <div className="lg:hidden text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-800">
+              <span className="text-primary">AI</span> 教育平台
+            </h1>
+            <p className="text-gray-500 mt-1 text-sm">智能学习，精准提升</p>
+          </div>
+
+          {/* 登录卡片 */}
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            {/* Tab 切换 */}
+            <div className="flex border-b border-gray-200 mb-6">
+              <button
+                className={`flex-1 py-3 text-center font-medium transition-colors ${activeTab === 'login' ? 'tab-active text-primary border-b-2 border-primary' : 'text-gray-500 hover:text-gray-700'}`}
+                onClick={() => setActiveTab('login')}
+              >
+                登录
+              </button>
+              <button
+                className={`flex-1 py-3 text-center font-medium transition-colors ${activeTab === 'register' ? 'tab-active text-primary border-b-2 border-primary' : 'text-gray-500 hover:text-gray-700'}`}
+                onClick={() => setActiveTab('register')}
+              >
+                注册
+              </button>
             </div>
-          </div>
 
-          {/* 密码或验证码 */}
-          {loginMode === 'password' ? (
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">密码</span>
-              </label>
-              <div className="input-wrapper">
-                <span className="input-prefix-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                </span>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={loginForm.password}
-                  onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                  placeholder="请输入密码"
-                  className="input input-bordered flex-1"
-                  required
-                />
+            {/* ===== 登录表单 ===== */}
+            {activeTab === 'login' && (
+              <form onSubmit={handleLogin} className="space-y-4">
+                {/* 登录方式切换 */}
+                <div className="flex justify-center gap-3 mb-2">
+                  <button
+                    type="button"
+                    className={`btn btn-sm rounded-full px-5 ${loginMode === 'password' ? 'btn-primary' : 'btn-ghost'}`}
+                    onClick={() => setLoginMode('password')}
+                  >
+                    密码登录
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn btn-sm rounded-full px-5 ${loginMode === 'code' ? 'btn-primary' : 'btn-ghost'}`}
+                    onClick={() => setLoginMode('code')}
+                  >
+                    验证码登录
+                  </button>
+                </div>
+
+                {/* 用户名/手机号 */}
+                <div className="form-control">
+                  <label className="label py-1">
+                    <span className="label-text font-medium text-sm">
+                      {loginMode === 'code' ? '手机号' : '手机号/用户名'}
+                    </span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <User size={18} />
+                    </span>
+                    <input
+                      type="text"
+                      value={loginForm.identifier}
+                      onChange={(e) => setLoginForm({ ...loginForm, identifier: e.target.value })}
+                      placeholder={loginMode === 'code' ? '请输入手机号' : '请输入手机号或用户名'}
+                      className="input input-bordered w-full pl-10 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* 密码 */}
+                {loginMode === 'password' ? (
+                  <div className="form-control">
+                    <label className="label py-1">
+                      <span className="label-text font-medium text-sm">密码</span>
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <Lock size={18} />
+                      </span>
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={loginForm.password}
+                        onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                        placeholder="请输入密码"
+                        className="input input-bordered w-full pl-10 pr-10 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                    <div className="text-right mt-1">
+                      <a
+                        href="#"
+                        className="text-xs text-primary hover:underline"
+                        onClick={(e) => { e.preventDefault(); setActiveTab('reset') }}
+                      >
+                        忘记密码？
+                      </a>
+                    </div>
+                  </div>
+                ) : (
+                  /* 验证码 */
+                  <div className="form-control">
+                    <label className="label py-1">
+                      <span className="label-text font-medium text-sm">验证码</span>
+                    </label>
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                          <Shield size={18} />
+                        </span>
+                        <input
+                          type="text"
+                          value={loginForm.code}
+                          onChange={(e) => setLoginForm({ ...loginForm, code: e.target.value })}
+                          placeholder="请输入验证码"
+                          className="input input-bordered w-full pl-10 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                          maxLength={6}
+                          required
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        className="btn btn-outline btn-primary shrink-0 rounded-lg"
+                        disabled={countdown > 0 || !isPhoneNumber(loginForm.identifier)}
+                        onClick={handleLoginSendCode}
+                      >
+                        {countdown > 0 ? `${countdown}s` : '获取'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 登录按钮 */}
                 <button
-                  type="button"
-                  className="input-suffix-btn"
-                  onClick={() => setShowPassword(!showPassword)}
+                  type="submit"
+                  className={`btn btn-primary w-full text-white mt-2 ${loading ? 'loading' : ''}`}
+                  disabled={loading}
                 >
-                  {showPassword ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
+                  {!loading && '登 录'}
+                </button>
+
+                {/* Demo 快捷登录 - 卡片式 */}
+                <div className="divider text-xs text-gray-400">快捷体验</div>
+                <div className="grid grid-cols-4 gap-3">
+                  {DEMO_BUTTONS.map(item => (
+                    <button
+                      key={item.role}
+                      type="button"
+                      className={`btn ${item.btnClass} btn-outline btn-sm gap-1 rounded-lg h-auto py-3 flex-col hover:scale-105 transition-transform`}
+                      onClick={() => handleDemoLogin(item.role)}
+                      disabled={loading}
+                    >
+                      <item.icon size={16} />
+                      <span className="text-xs">{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </form>
+            )}
+
+            {/* ===== 注册表单 ===== */}
+            {activeTab === 'register' && (
+              <form onSubmit={handleRegister} className="space-y-4">
+                {/* 用户名 */}
+                <div className="form-control">
+                  <label className="label py-1">
+                    <span className="label-text font-medium text-sm">用户名 <span className="text-error">*</span></span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <User size={18} />
+                    </span>
+                    <input
+                      type="text"
+                      value={registerForm.username}
+                      onChange={(e) => setRegisterForm({ ...registerForm, username: e.target.value })}
+                      placeholder="字母开头，3-50位字母数字下划线"
+                      className="input input-bordered w-full pl-10 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      maxLength={50}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* 真实姓名 */}
+                <div className="form-control">
+                  <label className="label py-1">
+                    <span className="label-text font-medium text-sm">真实姓名</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <IdCard size={18} />
+                    </span>
+                    <input
+                      type="text"
+                      value={registerForm.realName}
+                      onChange={(e) => setRegisterForm({ ...registerForm, realName: e.target.value })}
+                      placeholder="请输入真实姓名（选填）"
+                      className="input input-bordered w-full pl-10 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      maxLength={50}
+                    />
+                  </div>
+                </div>
+
+                {/* 手机号 */}
+                <div className="form-control">
+                  <label className="label py-1">
+                    <span className="label-text font-medium text-sm">手机号 <span className="text-error">*</span></span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <Phone size={18} />
+                    </span>
+                    <input
+                      type="tel"
+                      value={registerForm.phone}
+                      onChange={(e) => setRegisterForm({ ...registerForm, phone: e.target.value })}
+                      placeholder="请输入手机号"
+                      className="input input-bordered w-full pl-10 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      maxLength={11}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* 验证码 */}
+                <div className="form-control">
+                  <label className="label py-1">
+                    <span className="label-text font-medium text-sm">验证码 <span className="text-error">*</span></span>
+                  </label>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <Shield size={18} />
+                      </span>
+                      <input
+                        type="text"
+                        value={registerForm.code}
+                        onChange={(e) => setRegisterForm({ ...registerForm, code: e.target.value })}
+                        placeholder="请输入验证码"
+                        className="input input-bordered w-full pl-10 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                        maxLength={6}
+                        required
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      className="btn btn-outline btn-primary shrink-0 rounded-lg"
+                      disabled={countdown > 0 || !registerForm.phone || registerForm.phone.length !== 11}
+                      onClick={handleRegisterSendCode}
+                    >
+                      {countdown > 0 ? `${countdown}s` : '获取'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* 角色选择 - 按钮组 */}
+                <div className="form-control">
+                  <label className="label py-1">
+                    <span className="label-text font-medium text-sm">我是 <span className="text-error">*</span></span>
+                  </label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {ROLE_OPTIONS.map(item => (
+                      <button
+                        key={item.value}
+                        type="button"
+                        className={`btn btn-sm rounded-lg gap-1.5 ${registerForm.role === item.value ? `${item.color} text-white` : 'btn-outline'}`}
+                        onClick={() => setRegisterForm({ ...registerForm, role: item.value })}
+                      >
+                        <item.icon size={16} />
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 设置密码 */}
+                <div className="form-control">
+                  <label className="label py-1">
+                    <span className="label-text font-medium text-sm">设置密码 <span className="text-error">*</span></span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <Lock size={18} />
+                    </span>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={registerForm.password}
+                      onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
+                      placeholder="请设置密码（6-100位）"
+                      className="input input-bordered w-full pl-10 pr-10 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      <Eye size={18} />
+                    </button>
+                  </div>
+                  {registerForm.password && (
+                    <label className="label py-1">
+                      <span className={`label-text-alt ${registerForm.password.length >= 6 ? 'text-success' : 'text-warning'}`}>
+                        {registerForm.password.length >= 6 ? '✓ 密码长度合格' : '密码至少6个字符'}
+                      </span>
+                    </label>
                   )}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">验证码</span>
-              </label>
-              <div className="input-wrapper">
-                <span className="input-prefix-icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                </span>
-                <input
-                  type="text"
-                  value={loginForm.code}
-                  onChange={(e) => setLoginForm({ ...loginForm, code: e.target.value })}
-                  placeholder="请输入验证码"
-                  className="input input-bordered flex-1"
-                  maxLength={6}
-                  required
-                />
+                </div>
+
+                {/* 确认密码 */}
+                <div className="form-control">
+                  <label className="label py-1">
+                    <span className="label-text font-medium text-sm">确认密码 <span className="text-error">*</span></span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <Lock size={18} />
+                    </span>
+                    <input
+                      type="password"
+                      value={registerForm.confirmPassword}
+                      onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
+                      placeholder="请再次输入密码"
+                      className="input input-bordered w-full pl-10 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      required
+                    />
+                  </div>
+                  {registerForm.confirmPassword && registerForm.password !== registerForm.confirmPassword && (
+                    <label className="label py-1">
+                      <span className="label-text-alt text-error">两次密码不一致</span>
+                    </label>
+                  )}
+                </div>
+
+                {/* 注册按钮 */}
                 <button
-                  type="button"
-                  className="btn btn-outline btn-primary shrink-0"
-                  disabled={countdown > 0 || !isPhoneNumber(loginForm.identifier)}
-                  onClick={handleLoginSendCode}
+                  type="submit"
+                  className={`btn btn-primary w-full text-white mt-2 ${loading ? 'loading' : ''}`}
+                  disabled={loading || (registerForm.password !== registerForm.confirmPassword && registerForm.confirmPassword)}
                 >
-                  {countdown > 0 ? `${countdown}s` : '获取验证码'}
+                  {!loading && '注 册'}
                 </button>
-              </div>
-            </div>
-          )}
 
-          {/* 忘记密码 */}
-          {loginMode === 'password' && (
-            <div className="text-right">
-              <a
-                href="#"
-                className="text-sm text-primary hover:underline"
-                onClick={(e) => { e.preventDefault(); setActiveTab('reset') }}
-              >
-                忘记密码？
-              </a>
-            </div>
-          )}
+                <p className="text-center text-gray-500 text-sm">
+                  已有账号？
+                  <a href="#" className="text-primary hover:underline" onClick={(e) => { e.preventDefault(); setActiveTab('login') }}>点击登录</a>
+                </p>
+              </form>
+            )}
 
-          {/* 登录按钮 */}
-          <button
-            type="submit"
-            className={`btn btn-primary w-full text-white ${loading ? 'loading' : ''}`}
-            disabled={loading}
-          >
-            {!loading && '登 录'}
-          </button>
+            {/* ===== 重置密码表单 ===== */}
+            {activeTab === 'reset' && (
+              <form onSubmit={handleResetPassword} className="space-y-4">
+                <div className="text-center mb-4">
+                  <h2 className="text-xl font-semibold">重置密码</h2>
+                  <p className="text-gray-500 text-sm mt-1">通过手机验证码重置您的密码</p>
+                </div>
 
-          {/* 演示快捷登录 */}
-          <div className="divider">演示快捷登录</div>
-          <div className="grid grid-cols-4 gap-3">
-            <button
-              type="button"
-              className="btn btn-success btn-outline"
-              onClick={() => handleDemoLogin('STUDENT')}
-              disabled={loading}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              学生
-            </button>
-            <button
-              type="button"
-              className="btn btn-primary btn-outline"
-              onClick={() => handleDemoLogin('TEACHER')}
-              disabled={loading}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-              </svg>
-              老师
-            </button>
-            <button
-              type="button"
-              className="btn btn-warning btn-outline"
-              onClick={() => handleDemoLogin('PARENT')}
-              disabled={loading}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              家长
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary btn-outline"
-              onClick={() => handleDemoLogin('ADMIN')}
-              disabled={loading}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              管理员
-            </button>
-          </div>
-        </form>
-      )}
+                {/* 手机号 */}
+                <div className="form-control">
+                  <label className="label py-1">
+                    <span className="label-text font-medium text-sm">手机号</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <Phone size={18} />
+                    </span>
+                    <input
+                      type="tel"
+                      value={resetForm.phone}
+                      onChange={(e) => setResetForm({ ...resetForm, phone: e.target.value })}
+                      placeholder="请输入手机号"
+                      className="input input-bordered w-full pl-10 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      maxLength={11}
+                      required
+                    />
+                  </div>
+                </div>
 
-      {/* 注册表单 */}
-      {activeTab === 'register' && (
-        <form onSubmit={handleRegister} className="space-y-4">
-          {/* 用户名 */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium">用户名 <span className="text-error">*</span></span>
-            </label>
-            <div className="input-wrapper">
-              <span className="input-prefix-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </span>
-              <input
-                type="text"
-                value={registerForm.username}
-                onChange={(e) => setRegisterForm({ ...registerForm, username: e.target.value })}
-                placeholder="字母开头，3-50位字母数字下划线"
-                className="input input-bordered flex-1"
-                maxLength={50}
-                required
-              />
-            </div>
-          </div>
+                {/* 验证码 */}
+                <div className="form-control">
+                  <label className="label py-1">
+                    <span className="label-text font-medium text-sm">验证码</span>
+                  </label>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <Shield size={18} />
+                      </span>
+                      <input
+                        type="text"
+                        value={resetForm.code}
+                        onChange={(e) => setResetForm({ ...resetForm, code: e.target.value })}
+                        placeholder="请输入验证码"
+                        className="input input-bordered w-full pl-10 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                        maxLength={6}
+                        required
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      className="btn btn-outline btn-primary shrink-0 rounded-lg"
+                      disabled={countdown > 0 || !resetForm.phone || resetForm.phone.length !== 11}
+                      onClick={handleResetSendCode}
+                    >
+                      {countdown > 0 ? `${countdown}s` : '获取'}
+                    </button>
+                  </div>
+                </div>
 
-          {/* 真实姓名 */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium">真实姓名</span>
-            </label>
-            <div className="input-wrapper">
-              <span className="input-prefix-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </span>
-              <input
-                type="text"
-                value={registerForm.realName}
-                onChange={(e) => setRegisterForm({ ...registerForm, realName: e.target.value })}
-                placeholder="请输入真实姓名（选填）"
-                className="input input-bordered flex-1"
-                maxLength={50}
-              />
-            </div>
-          </div>
+                {/* 新密码 */}
+                <div className="form-control">
+                  <label className="label py-1">
+                    <span className="label-text font-medium text-sm">新密码</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <Lock size={18} />
+                    </span>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={resetForm.newPassword}
+                      onChange={(e) => setResetForm({ ...resetForm, newPassword: e.target.value })}
+                      placeholder="请设置新密码（6-100位）"
+                      className="input input-bordered w-full pl-10 pr-10 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      <Eye size={18} />
+                    </button>
+                  </div>
+                </div>
 
-          {/* 手机号 */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium">手机号 <span className="text-error">*</span></span>
-            </label>
-            <div className="input-wrapper">
-              <span className="input-prefix-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-              </span>
-              <input
-                type="tel"
-                value={registerForm.phone}
-                onChange={(e) => setRegisterForm({ ...registerForm, phone: e.target.value })}
-                placeholder="请输入手机号"
-                className="input input-bordered flex-1"
-                maxLength={11}
-                required
-              />
-            </div>
-          </div>
+                {/* 确认新密码 */}
+                <div className="form-control">
+                  <label className="label py-1">
+                    <span className="label-text font-medium text-sm">确认新密码</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <Lock size={18} />
+                    </span>
+                    <input
+                      type="password"
+                      value={resetForm.confirmPassword}
+                      onChange={(e) => setResetForm({ ...resetForm, confirmPassword: e.target.value })}
+                      placeholder="请再次输入新密码"
+                      className="input input-bordered w-full pl-10 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                      required
+                    />
+                  </div>
+                  {resetForm.confirmPassword && resetForm.newPassword !== resetForm.confirmPassword && (
+                    <label className="label py-1">
+                      <span className="label-text-alt text-error">两次密码不一致</span>
+                    </label>
+                  )}
+                </div>
 
-          {/* 验证码 */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium">验证码 <span className="text-error">*</span></span>
-            </label>
-            <div className="input-wrapper">
-              <span className="input-prefix-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </span>
-              <input
-                type="text"
-                value={registerForm.code}
-                onChange={(e) => setRegisterForm({ ...registerForm, code: e.target.value })}
-                placeholder="请输入验证码"
-                className="input input-bordered flex-1"
-                maxLength={6}
-                required
-              />
-              <button
-                type="button"
-                className="btn btn-outline btn-primary shrink-0"
-                disabled={countdown > 0 || !registerForm.phone || registerForm.phone.length !== 11}
-                onClick={handleRegisterSendCode}
-              >
-                {countdown > 0 ? `${countdown}s` : '获取验证码'}
-              </button>
-            </div>
-          </div>
-
-          {/* 角色选择 */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium">我是 <span className="text-error">*</span></span>
-            </label>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { value: 'STUDENT', label: '学生', icon: '📚' },
-                { value: 'TEACHER', label: '教师', icon: '🎓' },
-                { value: 'PARENT', label: '家长', icon: '👨‍👩‍👧' }
-              ].map(item => (
+                {/* 重置按钮 */}
                 <button
-                  key={item.value}
-                  type="button"
-                  className={`btn ${registerForm.role === item.value ? 'btn-primary' : 'btn-outline'}`}
-                  onClick={() => setRegisterForm({ ...registerForm, role: item.value })}
+                  type="submit"
+                  className={`btn btn-primary w-full text-white mt-2 ${loading ? 'loading' : ''}`}
+                  disabled={loading}
                 >
-                  {item.icon} {item.label}
+                  {!loading && '重置密码'}
                 </button>
-              ))}
-            </div>
-          </div>
 
-          {/* 设置密码 */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium">设置密码 <span className="text-error">*</span></span>
-            </label>
-            <div className="input-wrapper">
-              <span className="input-prefix-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </span>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={registerForm.password}
-                onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
-                placeholder="请设置密码（6-100位）"
-                className="input input-bordered flex-1"
-                required
-              />
-              <button
-                type="button"
-                className="input-suffix-btn"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              </button>
-            </div>
-            {registerForm.password && (
-              <label className="label">
-                <span className={`label-text-alt ${registerForm.password.length >= 6 ? 'text-success' : 'text-warning'}`}>
-                  {registerForm.password.length >= 6 ? '✓ 密码长度合格' : '密码至少6个字符'}
-                </span>
-              </label>
+                <p className="text-center text-gray-500 text-sm">
+                  <a href="#" className="text-primary hover:underline" onClick={(e) => { e.preventDefault(); setActiveTab('login') }}>
+                    返回登录
+                  </a>
+                </p>
+              </form>
             )}
           </div>
+        </div>
+      </div>
 
-          {/* 确认密码 */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium">确认密码 <span className="text-error">*</span></span>
-            </label>
-            <div className="input-wrapper">
-              <span className="input-prefix-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </span>
-              <input
-                type="password"
-                value={registerForm.confirmPassword}
-                onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
-                placeholder="请再次输入密码"
-                className="input input-bordered flex-1"
-                required
-              />
-            </div>
-            {registerForm.confirmPassword && registerForm.password !== registerForm.confirmPassword && (
-              <label className="label">
-                <span className="label-text-alt text-error">两次密码不一致</span>
-              </label>
-            )}
-          </div>
-
-          {/* 注册按钮 */}
-          <button
-            type="submit"
-            className={`btn btn-primary w-full text-white ${loading ? 'loading' : ''}`}
-            disabled={loading || (registerForm.password !== registerForm.confirmPassword && registerForm.confirmPassword)}
-          >
-            {!loading && '注 册'}
-          </button>
-
-          {/* 已有账号提示 */}
-          <p className="text-center text-gray-500 text-sm">
-            已有账号？
-            <a href="#" className="text-primary hover:underline" onClick={(e) => { e.preventDefault(); setActiveTab('login') }}>点击登录</a>
-          </p>
-        </form>
-      )}
-
-      {/* 重置密码表单 */}
-      {activeTab === 'reset' && (
-        <form onSubmit={handleResetPassword} className="space-y-4">
-          <div className="text-center mb-4">
-            <h2 className="text-xl font-semibold">重置密码</h2>
-            <p className="text-gray-500 text-sm mt-1">通过手机验证码重置您的密码</p>
-          </div>
-
-          {/* 手机号 */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium">手机号</span>
-            </label>
-            <div className="input-wrapper">
-              <span className="input-prefix-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-              </span>
-              <input
-                type="tel"
-                value={resetForm.phone}
-                onChange={(e) => setResetForm({ ...resetForm, phone: e.target.value })}
-                placeholder="请输入手机号"
-                className="input input-bordered flex-1"
-                maxLength={11}
-                required
-              />
-            </div>
-          </div>
-
-          {/* 验证码 */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium">验证码</span>
-            </label>
-            <div className="input-wrapper">
-              <span className="input-prefix-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </span>
-              <input
-                type="text"
-                value={resetForm.code}
-                onChange={(e) => setResetForm({ ...resetForm, code: e.target.value })}
-                placeholder="请输入验证码"
-                className="input input-bordered flex-1"
-                maxLength={6}
-                required
-              />
-              <button
-                type="button"
-                className="btn btn-outline btn-primary shrink-0"
-                disabled={countdown > 0 || !resetForm.phone || resetForm.phone.length !== 11}
-                onClick={handleResetSendCode}
-              >
-                {countdown > 0 ? `${countdown}s` : '获取验证码'}
-              </button>
-            </div>
-          </div>
-
-          {/* 新密码 */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium">新密码</span>
-            </label>
-            <div className="input-wrapper">
-              <span className="input-prefix-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </span>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={resetForm.newPassword}
-                onChange={(e) => setResetForm({ ...resetForm, newPassword: e.target.value })}
-                placeholder="请设置新密码（6-100位）"
-                className="input input-bordered flex-1"
-                required
-              />
-              <button
-                type="button"
-                className="input-suffix-btn"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          {/* 确认新密码 */}
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text font-medium">确认新密码</span>
-            </label>
-            <div className="input-wrapper">
-              <span className="input-prefix-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </span>
-              <input
-                type="password"
-                value={resetForm.confirmPassword}
-                onChange={(e) => setResetForm({ ...resetForm, confirmPassword: e.target.value })}
-                placeholder="请再次输入新密码"
-                className="input input-bordered flex-1"
-                required
-              />
-            </div>
-            {resetForm.confirmPassword && resetForm.newPassword !== resetForm.confirmPassword && (
-              <label className="label">
-                <span className="label-text-alt text-error">两次密码不一致</span>
-              </label>
-            )}
-          </div>
-
-          {/* 重置按钮 */}
-          <button
-            type="submit"
-            className={`btn btn-primary w-full text-white ${loading ? 'loading' : ''}`}
-            disabled={loading}
-          >
-            {!loading && '重置密码'}
-          </button>
-
-          {/* 返回登录 */}
-          <p className="text-center text-gray-500 text-sm">
-            <a href="#" className="text-primary hover:underline" onClick={(e) => { e.preventDefault(); setActiveTab('login') }}>
-              返回登录
-            </a>
-          </p>
-        </form>
-      )}
-
-      {/* 弹窗提示 */}
+      {/* ===== 弹窗提示 ===== */}
       {modal.show && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={closeModal}>
-          <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
           <div
             className="relative bg-white rounded-2xl shadow-2xl p-6 w-80 max-w-[90vw] animate-fadeIn"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* 图标 */}
             <div className="flex justify-center mb-4">
               {modal.type === 'success' ? (
                 <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                  </svg>
+                  <CheckCircle size={40} className="text-success" />
                 </div>
               ) : (
                 <div className="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
+                  <AlertCircle size={40} className="text-error" />
                 </div>
               )}
             </div>
 
-            {/* 标题 */}
             <h3 className={`text-xl font-bold text-center mb-2 ${modal.type === 'success' ? 'text-success' : 'text-error'}`}>
               {modal.title}
             </h3>
 
-            {/* 内容 */}
             <p className="text-gray-600 text-center mb-4">{modal.text}</p>
 
-            {/* 按钮 */}
             <button
               className={`btn w-full ${modal.type === 'success' ? 'btn-success' : 'btn-error'} text-white`}
               onClick={closeModal}

@@ -1,10 +1,10 @@
 import { useAuth } from '../../hooks/useAuth'
 import StatCard from '../../components/common/StatCard'
+import { Users, ClipboardList, CheckCircle, Building, FolderOpen, BarChart3 } from 'lucide-react'
 
 export function TeacherHome() {
   const { user } = useAuth()
 
-  // Mock data
   const stats = {
     studentCount: 128,
     pendingGrading: 15,
@@ -24,73 +24,59 @@ export function TeacherHome() {
     { id: 3, name: '高三(3)班', avgScore: 82 }
   ]
 
+  // 老师端统一角色色：primary (靛蓝)
   return (
-    <>
-      <h1 className="text-2xl font-bold mb-6">欢迎回来，{user?.realName || '老师'}！</h1>
+    <div className="page-enter space-y-6">
+      <h1 className="text-2xl font-bold">欢迎回来，{user?.realName || '老师'}！</h1>
 
       {/* 统计卡片 */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="学生总数"
           value={stats.studentCount}
           color="primary"
-          icon={
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
-            </svg>
-          }
+          icon={<Users size={24} strokeWidth={1.5} />}
         />
         <StatCard
           title="待批改"
           value={stats.pendingGrading}
-          color="secondary"
-          icon={
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-            </svg>
-          }
+          color="primary"
+          icon={<ClipboardList size={24} strokeWidth={1.5} />}
         />
         <StatCard
           title="已批改"
           value={stats.gradedCount}
-          color="success"
-          icon={
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          }
+          color="primary"
+          icon={<CheckCircle size={24} strokeWidth={1.5} />}
         />
         <StatCard
           title="班级数"
           value={stats.classCount}
-          color="info"
-          icon={
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-            </svg>
-          }
+          color="primary"
+          icon={<Building size={24} strokeWidth={1.5} />}
         />
       </div>
 
       {/* 功能模块 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 待批改作业 */}
-        <div className="card bg-base-100 shadow-md">
-          <div className="card-body">
-            <h2 className="card-title">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-              </svg>
+        <div className="card bg-base-100 rounded-xl shadow-card-elevated border border-base-200">
+          <div className="card-body p-5">
+            <h2 className="card-title mb-3">
+              <FolderOpen size={20} className="text-primary" />
               待批改作业
             </h2>
             <div className="space-y-2">
               {pendingHomework.map(homework => (
-                <div key={homework.id} className="flex items-center justify-between p-3 bg-base-200 rounded-lg">
+                <div
+                  key={homework.id}
+                  className="flex items-center justify-between p-3 rounded-lg border-l-[3px] border-primary/30 bg-base-200 hover:bg-base-300/50 transition-colors cursor-pointer"
+                >
                   <div>
                     <p className="font-medium">{homework.studentName} - {homework.title}</p>
-                    <p className="text-sm text-gray-500">{homework.subject} · {homework.submitTime}</p>
+                    <p className="text-sm text-base-content/50">{homework.subject} · {homework.submitTime}</p>
                   </div>
-                  <button className="btn btn-sm btn-primary">批改</button>
+                  <button className="btn btn-sm btn-primary btn-ghost text-white hover:scale-95 transition-transform">批改</button>
                 </div>
               ))}
             </div>
@@ -98,21 +84,26 @@ export function TeacherHome() {
         </div>
 
         {/* 班级学情 */}
-        <div className="card bg-base-100 shadow-md">
-          <div className="card-body">
-            <h2 className="card-title">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-info" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
+        <div className="card bg-base-100 rounded-xl shadow-card-elevated border border-base-200">
+          <div className="card-body p-5">
+            <h2 className="card-title mb-3">
+              <BarChart3 size={20} className="text-primary" />
               班级学情概览
             </h2>
             <div className="space-y-4">
               {classList.map(cls => (
-                <div key={cls.id} className="flex items-center justify-between">
-                  <span>{cls.name}</span>
-                  <div className="flex items-center gap-2">
-                    <progress className="progress progress-primary w-32" value={cls.avgScore} max="100"></progress>
-                    <span className="text-sm">{cls.avgScore}分</span>
+                <div key={cls.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-base-200/50 transition-colors">
+                  <span className="font-medium">{cls.name}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-32">
+                      <div className="w-full h-2 bg-base-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-primary rounded-full transition-all"
+                          style={{ width: `${cls.avgScore}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    <span className="text-sm font-semibold w-12 text-right">{cls.avgScore}分</span>
                   </div>
                 </div>
               ))}
@@ -120,7 +111,7 @@ export function TeacherHome() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

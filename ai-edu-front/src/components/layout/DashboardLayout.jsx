@@ -3,6 +3,7 @@ import { useAuth } from '../../hooks/useAuth'
 import Sidebar from '../common/Sidebar'
 import AIChatPanel from '../common/AIChatPanel'
 import { getPageMeta } from '../../constants/pageMeta'
+import { Menu } from 'lucide-react'
 
 export function DashboardLayout({ menuItems, title, roleColor = 'primary' }) {
   const { user, logout } = useAuth()
@@ -13,6 +14,12 @@ export function DashboardLayout({ menuItems, title, roleColor = 'primary' }) {
     primary: 'bg-primary',
     success: 'bg-success',
     warning: 'bg-warning'
+  }
+
+  const roleTextColors = {
+    primary: 'text-primary',
+    success: 'text-success',
+    warning: 'text-warning'
   }
 
   // 根据当前路由获取页面元信息
@@ -39,14 +46,12 @@ export function DashboardLayout({ menuItems, title, roleColor = 'primary' }) {
         <nav className="navbar bg-base-200 shadow-md sticky top-0 z-30">
           <div className="flex-none lg:hidden">
             <label htmlFor="sidebar-drawer" className="btn btn-square btn-ghost">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-5 h-5 stroke-current">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
-              </svg>
+              <Menu size={20} strokeWidth={1.5} />
             </label>
           </div>
           <div className="flex-1">
             <span className="text-xl font-bold">
-              <span className="text-primary">AI</span> 教育平台 · {title}
+              <span className={roleTextColors[roleColor]}>AI</span> 教育平台 · {title}
             </span>
           </div>
           <div className="flex-none gap-2">
