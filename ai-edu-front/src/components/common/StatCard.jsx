@@ -1,4 +1,6 @@
-export function StatCard({ title, value, icon: Icon, color = 'primary' }) {
+import { TrendingUp, TrendingDown } from 'lucide-react'
+
+export function StatCard({ title, value, icon: Icon, color = 'primary', trend, trendLabel }) {
   const colorMap = {
     primary: { figure: 'text-primary', bg: 'bg-primary/10', border: 'from-primary/80 to-primary', ring: 'ring-primary/20' },
     secondary: { figure: 'text-secondary', bg: 'bg-secondary/10', border: 'from-secondary/80 to-secondary', ring: 'ring-secondary/20' },
@@ -12,6 +14,11 @@ export function StatCard({ title, value, icon: Icon, color = 'primary' }) {
   const iconContent = typeof Icon === 'function'
     ? <Icon size={24} strokeWidth={1.5} />
     : Icon
+
+  // 趋势方向：positive=增长(绿), negative=下降(红), neutral=持平
+  const trendDirection = trend || 'neutral'
+  const trendColor = trendDirection === 'positive' ? 'text-success' : trendDirection === 'negative' ? 'text-error' : 'text-base-content/40'
+  const TrendIcon = trendDirection === 'positive' ? TrendingUp : trendDirection === 'negative' ? TrendingDown : null
 
   return (
     <div className={`group stat-card relative bg-base-100 rounded-xl shadow-card-elevated hover:shadow-card-hover transition-all duration-200 overflow-hidden border border-base-200 hover:border-base-300 hover:-translate-y-0.5`}>
@@ -28,6 +35,12 @@ export function StatCard({ title, value, icon: Icon, color = 'primary' }) {
         <div className="flex-1 min-w-0">
           <div className="stat-title text-xs font-medium text-base-content/60 mb-0.5">{title}</div>
           <div className={`stat-value text-2xl font-bold ${c.figure} truncate`}>{value}</div>
+          {trendLabel && (
+            <div className={`flex items-center gap-1 mt-0.5 text-xs font-medium ${trendColor}`}>
+              {TrendIcon && <TrendIcon size={12} strokeWidth={2} />}
+              <span>{trendLabel}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -54,7 +54,7 @@ export default {
   daisyui: {
     themes: [
       {
-        light: {
+        "aiedu-light": {
           "primary": "#4F46E5",
           "primary-content": "#FFFFFF",
           "secondary": "#0D9488",
@@ -77,7 +77,7 @@ export default {
           "error-content": "#FFFFFF",
         },
       },
-      "dark", "cupcake", "bumblebee",
     ],
+    base: false,
   },
 }

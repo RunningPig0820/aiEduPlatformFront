@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 覆盖 daisyUI 默认主题颜色，防止粉色污染 */
+:root {
+  --s: 60.0224% 0.103837 184.703992 !important;
+  --sc: 100% 0 0 !important;
+  --p: 51.0573% 0.230053 276.965635 !important;
+  --pc: 100% 0 0 !important;
+}
+
 /* 自定义样式 */
 
 /* 登录页背景 — 品牌渐变 */
@@ -112,3 +120,17 @@
 .hero .animate-fadeIn:nth-child(3) { animation-delay: 200ms; }
 .hero .animate-fadeIn:nth-child(4) { animation-delay: 300ms; }
 .hero .animate-fadeIn:nth-child(5) { animation-delay: 400ms; }
+
+/* 抽屉滑入动画 */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.3s ease-out forwards;
+}

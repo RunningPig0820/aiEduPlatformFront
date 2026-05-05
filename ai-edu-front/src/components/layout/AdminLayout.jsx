@@ -1,17 +1,34 @@
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import AIChatPanel from '../common/AIChatPanel'
 import { showPendingToast } from '../common/PendingFeature'
-import { Menu, Bell } from 'lucide-react'
+import { Menu, Bell, ChevronRight, Home } from 'lucide-react'
 
 export function AdminLayout({ menuItems, title = '管理员端', pageCode }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const handleLogout = async () => {
     await logout()
     navigate('/login')
   }
+
+  // 根据当前路径生成面包屑
+  const getBreadcrumbItems = () => {
+    const path = location.pathname
+    const items = [{ label: '首页', path: '/admin', icon: <Home size={14} /> }]
+
+    // 查找匹配的菜单项
+    const currentMenu = menuItems?.find(item => item.path === path)
+    if (currentMenu && path !== '/admin') {
+      items.push({ label: currentMenu.label })
+    }
+
+    return items
+  }
+
+  const breadcrumbs = getBreadcrumbItems()
 
   return (
     <div className="drawer lg:drawer-open">
@@ -59,31 +76,49 @@ export function AdminLayout({ menuItems, title = '管理员端', pageCode }) {
           </div>
         </nav>
 
-        {/* 主内容区 + AI 面板 */}
-        <div className="flex flex-1 min-h-0">
-          <main className="flex-1 p-6 bg-base-100 overflow-auto">
-            <Outlet />
-          </main>
-
-          {/* AI 助手面板 */}
-          <div className="hidden lg:block h-full">
-            <AIChatPanel pageCode={pageCode} />
+        {/* 面包屑导航 */}
+        <div className="px-6 py-2 bg-base-100 border-b border-base-200">
+          <div className="flex items-center gap-1 text-sm">
+            {breadcrumbs.map((crumb, index) => (
+              <div key={index} className="flex items-center gap-1">
+                {index > 0 && <ChevronRight size={14} className="text-base-content/40" />}
+                {crumb.path ? (
+                  <a
+                    href={crumb.path}
+                    className="flex items-center gap-1 text-base-content/60 hover:text-secondary transition-colors"
+                  >
+                    {crumb.icon}
+                    {crumb.label}
+                  </a>
+                ) : (
+                  <span className="text-base-content font-medium">{crumb.label}</span>
+                )}
+              </div>
+            ))}
           </div>
         </div>
+
+        {/* 主内容区 */}
+        <main className="flex-1 p-6 bg-base-200 overflow-auto">
+          <Outlet />
+        </main>
+
+        {/* AI 助手 - 抽屉式 */}
+        <AIChatPanel pageCode={pageCode} />
       </div>
 
       {/* 侧边栏 */}
       <div className="drawer-side">
         <label htmlFor="admin-sidebar-drawer" className="drawer-overlay"></label>
         <ul className="menu p-4 w-64 bg-base-200 min-h-full">
-          <li className="menu-title">
+          <li className="menu-title mb-2">
             <span className="text-lg font-bold">
               <span className="text-secondary">管理</span>后台
             </span>
           </li>
           {menuItems?.map((item, index) => (
             <li key={index}>
-              <MenuItem item={item} />
+              <MenuItem item={item} currentPath={location.pathname} />
             </li>
           ))}
         </ul>
@@ -93,9 +128,11 @@ export function AdminLayout({ menuItems, title = '管理员端', pageCode }) {
 }
 
 /**
- * 菜单项组件
+ * 菜单项组件 - 带激活状态高亮
  */
-function MenuItem({ item }) {
+function MenuItem({ item, currentPath }) {
+  const isActive = currentPath === item.path
+
   // 待开发状态
   if (item.status === 'pending') {
     return (
@@ -113,14 +150,19 @@ function MenuItem({ item }) {
     )
   }
 
-  // 正常状态 - 使用 NavLink 样式
+  // 正常状态 - 带激活高亮
   return (
     <a
       href={item.path}
-      className="flex items-center gap-3 hover:bg-base-300 rounded-lg p-2"
+      className={`flex items-center gap-3 rounded-lg p-2 transition-all duration-150 ${
+        isActive
+          ? 'bg-secondary/10 font-semibold text-secondary'
+          : 'hover:bg-base-300 text-base-content/80'
+      }`}
     >
       {item.icon}
       {item.label}
+      {isActive && <div className="w-1 h-4 bg-secondary rounded-full ml-auto"></div>}
     </a>
   )
 }

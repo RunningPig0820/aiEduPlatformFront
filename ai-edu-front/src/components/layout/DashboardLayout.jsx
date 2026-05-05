@@ -70,17 +70,13 @@ export function DashboardLayout({ menuItems, title, roleColor = 'primary' }) {
           </div>
         </nav>
 
-        {/* 主内容区 + AI 面板 */}
-        <div className="flex flex-1 min-h-0">
-          <main className="flex-1 p-6 bg-base-100 overflow-auto">
-            <Outlet />
-          </main>
+        {/* 主内容区 */}
+        <main className="flex-1 p-6 bg-base-100 overflow-auto">
+          <Outlet />
+        </main>
 
-          {/* AI 助手面板 - 仅桌面端显示 */}
-          <div className="hidden lg:block h-full">
-            <AIChatPanel pageCode={getPageCode()} />
-          </div>
-        </div>
+        {/* AI 助手 - 抽屉式 */}
+        <AIChatPanel pageCode={getPageCode()} />
       </div>
 
       {/* 侧边栏 */}

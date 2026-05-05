@@ -31,6 +31,7 @@ import StudentHome from './pages/student/Home'
 import TeacherHome from './pages/teacher/Home'
 import ParentHome from './pages/parent/Home'
 import AdminHome from './pages/admin/Home'
+import AdminOrganizations from './pages/admin/Organizations'
 import KnowledgeGraphPage from './pages/kg/KnowledgeGraphPage'
 import { ROUTES, ROLES } from './constants'
 
@@ -159,6 +160,7 @@ export const routes = [
     ),
     children: [
       { index: true, element: <AdminHome /> },
+      { path: 'organizations', element: <AdminOrganizations /> },
       { path: 'knowledge-graph', element: <KnowledgeGraphPage /> }
     ]
   },
